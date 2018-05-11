@@ -1,20 +1,15 @@
 \documentclass[master=mai,masteroption=ecs]{kulemt}
 \setup{title={Complete decision tree induction functionality in scikit-learn},
-  author={Ir. Sven Van Hove},
+  author={Ir.\ Sven Van Hove},
   promotor={Prof.\,dr.\ Jesse Davis \and Prof.\,dr.\,ir.\ Hendrik Blockeel},
-  assessor={Ir.\,Kn. Owsmuch\and K. Nowsrest}, %TODO update assessors
+  assessor={Dr.\,ir.\ Marc Claesen},
   assistant={Elia Van Wolputte}}
 
-  % The following \setup may be removed entirely if no filing card is wanted
-% \setup{filingcard,
-%   translatedtitle=,
-%   udc=681.3*I20,
-%   shortabstract={Here comes a very short abstract, containing no more than 500
-%     words. \LaTeX\ commands can be used here. Blank lines (or the command
-%     \texttt{\string\pa r}) are not allowed!
-%     \endgraf \lipsum[2]}}
+\setup{filingcard,
+  translatedtitle=Complete beslissingsboom inductie functionaliteit in scikit-learn,
+  udc=681.3*I20,
+  shortabstract={500 word abstract}} %TODO copy abstract
 
-% Uncomment the next line for generating the cover page
 % \setup{coverpageonly}
 
 \setup{font=lm}
@@ -32,14 +27,6 @@
 
 \tableofcontents*
 
-% # BACKGROUND
-% Scikit Learn (scikit-learn.org/) is well-known and increasingly popular machine learning library implemented in python. 
-% Surprisingly, its implementations for some algorithm, particularly for more classical techniques such as decision trees, 
-% are very incomplete with respect to the functionality provided in other packages such as Weka (http://www.cs.waikato.ac.nz/ml/weka/). 
-% The missing functionality can lead to large decreases in performance. For example, we have observed that Weka can be > 25% 
-% improvements in classification accuracy on some datasets compared to Scikit Learn!
-% # GOAL
-% Develop a (more) complete python version of decision tree learners (and possible other algorithms) that works with Scikit Learn.
 % # APPROACH:
 % 1. Investigate and characterize the differences in functionality between Weka and Scikit Learn for decision trees.
 % 2. Implement a python version of a decision tree learner that has the required basic functionality and that uses the scikit learn interfaces.
@@ -48,32 +35,23 @@
 % 5. Extend the decision tree implementation to more advance settings (e.g., online learning, …).
 % 6. Provide good documentation on how the code works.
 
-
-
 \begin{abstract} %TODO update abstract
   The \texttt{abstract} environment contains a more extensive overview of
   the work. But it should be limited to one page.~\cite{eibe2016weka}
 \end{abstract}
 
-% A list of figures and tables is optional
-%\listoffigures
-%\listoftables
-% If you only have a few figures and tables you can use the following instead
-% \listoffiguresandtables
-
 \mainmatter%
 
-% Introduction
-% Background and related work
-% Chapters on contributions
-% Conclusions (recap contributions), retrospective and future work
-
 \include{chapters/00-intro}
-\include{chapters/10-chap-1}
+\include{chapters/10-literature}
+\include{chapters/20-software}
+\include{chapters/30-methdology}
+\include{chapters/40-results}
+\include{chapters/50-conclusion}
 
 \appendixpage*
 \appendix
-\include{chapters/90-app-A}
+\include{chapters/90-app-A} %TODO remove?
 
 \backmatter%
 \bibliographystyle{alpha} %abbrv

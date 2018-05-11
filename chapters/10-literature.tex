@@ -1,0 +1,93 @@
+\chapter{Literature review}\label{cha:literature}
+The relevant literature for this thesis mostly consists of papers concerning decision tree induction. These go back many decades, but fortunately there are some review and survey papers that make the work easier~\cite{murthy1998automatic, kotsiantis2007supervised}. On top of the classic literature, the source code and accompanying documentation of scikit-learn and Weka has also been a rich source of information.
+
+\section{Prerequisites}
+The reader ought to be familiar with basic machine learning concepts such as supervised learning, classification, regression, model validation and ensemble learning. Furthermore, basic knowledge of decision tree induction is expected. The most important basic concepts will be discussed briefly. Topics that are particularly important for the next chapters will be elaborated on.
+
+\section{Scope}
+A wide variety of decision tree induction algorithms exists. Here, only the \emph{top down induction of decision trees (TDIDT)} family is considered because it is the most common approach and it is particularly relevant to the software tools under scrutiny.
+
+Furthermore, only classification trees are considered. With little effort, most TDIDT classification algorithms can be converted to regression algorithms. Yet, these are far less popular and better alternatives such as Xgboost~\cite{xgboost} exist.
+
+Ensemble methods are also out of scope. Recent decision tree algorithms rarely work with a single tree, but rather with an ensemble of trees. Random forests~\cite{rf} is a very popular example. Regardless, the scope of this thesis concerns the fundamentals of decision trees, and not their derivatives. Implementation improvements suggested in this thesis could still potentially benefit related ensemble methods.
+
+The algorithms in scope are all offline learning methods invented before the big data era. This implies that computation is done locally and that all data has to fit in memory. As such, online learning methods or distributed algorithms are out of scope.
+
+Finally, only univariate tests are in scope. The test performed in each internal node must only evaluate one attribute of the observation. For categorical attributes, this typically implies checking whether or not the input is equal to a fixed category. For numeric attributes, the input value is compared against a fixed threshold using \(\leq\) or \(>\). Consequently, the input space is partitioned recursively using axis-aligned hyperplanes. This scope limitation precludes well-known but seldom used extensions such as oblique trees.
+
+\section{Terminology}
+Throughout the relevant literature, there is a lack of ubiquitous vocabulary shared by all researchers. To avoid confusion, some basic terms are reviewed. A \emph{decision tree} consists of \emph{(internal) nodes} which are connected to other nodes via a one-to-many \emph{parent-child} relation on one hand, and \emph{leaves} which have no children on the other hand. The \emph{root node} is the only node without parent. In a \emph{binary tree}, the number of children per node is either zero or two.
+
+Induction algorithms typically receive a \emph{training set} as input data to construct a decision tree while a \emph{test set} is used afterwards for model validation. These sets are tables of data where each row represents an \emph{observation}. All observation are fully described by a common set of \emph{attributes}. Some attributes are \emph{categorical}, others may be \emph{numeric}. Because decision tree induction is a part of supervised learning, one or more \emph{class labels} are also associated with each observation.
+
+\section{Advantages and disadvantages} %motivation -> move to intro?
+\section{Comparison to other ML algos}
+\section{Math}
+\section{Splitting heuristics}
+\section{Stopping criteria}
+\section{Overfitting}
+\section{Extensions}
+% \section{Ensembles}
+%         Bagging
+%         Boosting
+\section{Conclusion}
+
+% Intro to DT
+%     Prerequisites & definitions
+%         categorical vs numeric
+%         pure nodes
+%         see Excel
+%         ==> don't explain at length what target audience already knows!
+%             focus on pruning, categorical/numerical
+%     Why use?
+%         comprehensible, learning speed, classification speed, few hyperparams, missing values easy {kotsiantis2007supervised}
+%             TODO missing values fix?
+%         note: fuzzy algorithm names (versioning)
+%         redundant attributes?
+%         interdependent/correlated attributes?
+%         noise resistance? ~ overfitting
+
+%scikit
+% Simple to understand and to interpret. Trees can be visualised.
+% Requires little data preparation. Other techniques often require data normalisation, dummy variables need to be created and blank values to be removed. Note however that this module does not support missing values.
+% The cost of using the tree (i.e., predicting data) is logarithmic in the number of data points used to train the tree.
+% Able to handle both numerical and categorical data. Other techniques are usually specialised in analysing datasets that have only one type of variable. See algorithms for more information.
+% Able to handle multi-output problems.
+% Uses a white box model. If a given situation is observable in a model, the explanation for the condition is easily explained by boolean logic. By contrast, in a black box model (e.g., in an artificial neural network), results may be more difficult to interpret.
+% Possible to validate a model using statistical tests. That makes it possible to account for the reliability of the model.
+% Performs well even if its assumptions are somewhat violated by the true model from which the data were generated.
+
+% Decision-tree learners can create over-complex trees that do not generalise the data well. This is called overfitting. Mechanisms such as pruning (not currently supported), setting the minimum number of samples required at a leaf node or setting the maximum depth of the tree are necessary to avoid this problem.
+% Decision trees can be unstable because small variations in the data might result in a completely different tree being generated. This problem is mitigated by using decision trees within an ensemble.
+% The problem of learning an optimal decision tree is known to be NP-complete under several aspects of optimality and even for simple concepts. Consequently, practical decision-tree learning algorithms are based on heuristic algorithms such as the greedy algorithm where locally optimal decisions are made at each node. Such algorithms cannot guarantee to return the globally optimal decision tree. This can be mitigated by training multiple trees in an ensemble learner, where the features and samples are randomly sampled with replacement.
+% There are concepts that are hard to learn because decision trees do not express them easily, such as XOR, parity or multiplexer problems.
+% Decision tree learners create biased trees if some classes dominate. It is therefore recommended to balance the dataset prior to fitting with the decision tree.
+
+%     Comparison to other ML algos
+%         works best on categorical features -> SVM, NN for numerical
+%     Math
+%         axis-aligned hyperrectangles
+%         optimal tree: NP-Complete {npcomplete}
+%         big O's -> scikit docs
+%     Splitting heuristics
+%         leaf, binary/n-ary
+%         distance: gini {cart} | info theory {shannon1948mathematical}: entropy, IG, IGR | chi²
+%         not all that important {cart} -> stopping criteria!
+%             same for attribute selection -> TODO more details
+%     Stopping criteria
+%     Overfitting
+%         Early stopping
+%         Pruning -> comprehensibility
+%             non-exhaustive
+%                 cost complexity pruning: {cart}
+%                 REP: {quinlan1987simplifying}
+%                 EBP: {?}
+%                 pessimistic: {quinlan1987simplifying, c45}
+%                 MDL: {quinlan1989inferring}
+%             easy to switch, but evaluate holistically
+%         greedy -> horizon
+%     Extensions
+%         Rules
+%             prune via rules
+%         Oblique (multivariate)
+%         Logic
