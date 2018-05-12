@@ -14,12 +14,15 @@
 % Goal
 % Challenges
 
-Decision tree induction is one of the most well-known tools in the machine learning community. Most of the theoretical groundwork was laid in the last two decades of the previous century. Researchers Leo Breiman and Ross Quinlan have been particularly influential in this space. Contemporary AI researchers focus most of their attentions on neural networks and in particular deep learning --- the hype around DeepMind's AlphaGo~\cite{alphago} victories comes to mind --- but decision tree research is not dead. Researchers still continue to propose new or improved algorithms and analyses.
+Decision tree induction is one of the most well-known tools in the machine learning community. Most of the theoretical groundwork was laid in the last three decades of the previous century. Researchers Leo Breiman and Ross Quinlan have been particularly influential in this space. Contemporary AI researchers focus most of their attentions on neural networks and in particular deep learning --- the recent hype around DeepMind's AlphaGo~\cite{alphago} victories comes to mind --- but decision tree research is not dead. Researchers still continue to propose new or improved algorithms and analyses.
+%TODO mention ID3, C4.5, CART early on
 
-Theory is one thing, but the algorithms need to be implemented as computer programs to actually be useful. Sci-kit learn~\cite{scikit-learn} is a very popular machine learning library written in Python. As such, it also contains implementations of various decision tree induction algorithms. Before sci-kit learn became popular, a Java library called Weka~\cite{eibe2016weka} (or ``Waikato Environment for Knowledge Analysis'' in full) was often used instead. Even today, the implementations of decision tree algorithms in Weka are still in many respects superior to those in scikit-learn. Other libraries that implement similar algorithms exist (e.g., Apache Spark~\cite{spark}), but those are beyond the scope of this text.
+Theory is one thing, but the algorithms need to be implemented as computer programs to actually be useful. Sci-kit learn~\cite{scikit-learn} is a very popular machine learning library written in Python. As such, it also contains implementations of various decision tree induction algorithms. Before sci-kit learn became popular, a Java-based library called Weka~\cite{eibe2016weka} (or ``Waikato Environment for Knowledge Analysis'' in full) was often used instead. Even today, the implementations of decision tree algorithms in Weka are still in many respects superior to those in scikit-learn. Other libraries that implement similar algorithms exist (e.g., Apache Spark~\cite{spark}), but those are beyond the scope of this text.
 
 The goal of this thesis is to alleviate the discrepancies between sci-kit learn and Weka concerning decision tree induction. Mind that decision tree induction tools can never be truly ``complete'' as stated in the title because the field is immensely broad and still continues to grow. Nevertheless, an effort can be made to improve feature parity between these two popular tools.
 
 \section{Thesis structure}
 The structure of the remainder of this text is as follows. First, an overview of the literature study concerning decision tree induction will be presented. In particular the link between an implementation and its underlying algorithm will be clarified, including the effects of that choice on the capabilities of the tool.
 %TODO structure
+
+%motivation: problematic dataset

@@ -1,93 +1,181 @@
 \chapter{Literature review}\label{cha:literature}
-The relevant literature for this thesis mostly consists of papers concerning decision tree induction. These go back many decades, but fortunately there are some review and survey papers that make the work easier~\cite{murthy1998automatic, kotsiantis2007supervised}. On top of the classic literature, the source code and accompanying documentation of scikit-learn and Weka has also been a rich source of information.
+The relevant literature for this thesis mostly consists of papers concerning decision tree induction. These go back many decades, but fortunately there are some review and survey papers that provide a convenient overview~\cite{murthy1998automatic, rokach2005top, kotsiantis2007supervised}. On top of the classic literature, the source code and accompanying documentation of scikit-learn and Weka has also been a rich source of information.
 
 \section{Prerequisites}
-The reader ought to be familiar with basic machine learning concepts such as supervised learning, classification, regression, model validation and ensemble learning. Furthermore, basic knowledge of decision tree induction is expected. The most important basic concepts will be discussed briefly. Topics that are particularly important for the next chapters will be elaborated on.
+The reader ought to be familiar with basic machine learning concepts such as supervised learning, classification, regression, bias-variance trade-off, model validation and ensemble learning. Furthermore, basic knowledge of decision tree induction is expected. The most important basic concepts will be discussed briefly. Topics that are particularly important for the next chapters will be elaborated on.
 
 \section{Scope}
 A wide variety of decision tree induction algorithms exists. Here, only the \emph{top down induction of decision trees (TDIDT)} family is considered because it is the most common approach and it is particularly relevant to the software tools under scrutiny.
 
 Furthermore, only classification trees are considered. With little effort, most TDIDT classification algorithms can be converted to regression algorithms. Yet, these are far less popular and better alternatives such as Xgboost~\cite{xgboost} exist.
 
-Ensemble methods are also out of scope. Recent decision tree algorithms rarely work with a single tree, but rather with an ensemble of trees. Random forests~\cite{rf} is a very popular example. Regardless, the scope of this thesis concerns the fundamentals of decision trees, and not their derivatives. Implementation improvements suggested in this thesis could still potentially benefit related ensemble methods.
+Ensemble methods are also out of scope. Recent decision tree algorithms rarely work with a single tree, but rather with an ensemble of trees. Random forests~\cite{rf} is a very popular example of bootstrap aggregating or \emph{bagging}. Regardless, the scope of this thesis concerns the fundamentals of decision trees, and not their derivatives. Implementation improvements suggested in this thesis could still potentially benefit related ensemble methods.
 
 The algorithms in scope are all offline learning methods invented before the big data era. This implies that computation is done locally and that all data has to fit in memory. As such, online learning methods or distributed algorithms are out of scope.
 
-Finally, only univariate tests are in scope. The test performed in each internal node must only evaluate one attribute of the observation. For categorical attributes, this typically implies checking whether or not the input is equal to a fixed category. For numeric attributes, the input value is compared against a fixed threshold using \(\leq\) or \(>\). Consequently, the input space is partitioned recursively using axis-aligned hyperplanes. This scope limitation precludes well-known but seldom used extensions such as oblique trees.
+Finally, only univariate tests are in scope. The test performed in each internal node must only evaluate one attribute of the observation. For categorical attributes, this typically implies checking whether or not the input is equal to a fixed category. For numeric attributes, the input value is compared against a fixed threshold using $\leq$ or $>$. Consequently, the input space is partitioned recursively using axis-aligned hyperplanes. This scope limitation precludes well-known but seldom used extensions such as oblique trees.
 
 \section{Terminology}
 Throughout the relevant literature, there is a lack of ubiquitous vocabulary shared by all researchers. To avoid confusion, some basic terms are reviewed. A \emph{decision tree} consists of \emph{(internal) nodes} which are connected to other nodes via a one-to-many \emph{parent-child} relation on one hand, and \emph{leaves} which have no children on the other hand. The \emph{root node} is the only node without parent. In a \emph{binary tree}, the number of children per node is either zero or two.
 
-Induction algorithms typically receive a \emph{training set} as input data to construct a decision tree while a \emph{test set} is used afterwards for model validation. These sets are tables of data where each row represents an \emph{observation}. All observation are fully described by a common set of \emph{attributes}. Some attributes are \emph{categorical}, others may be \emph{numeric}. Because decision tree induction is a part of supervised learning, one or more \emph{class labels} are also associated with each observation.
+Induction algorithms typically receive a \emph{training set} as input data to construct a decision tree while a \emph{test set} is used afterwards for model validation. These sets are tables of data where each row represents an \emph{observation}. All observation are fully described by a common set of \emph{attributes}. Some attributes are \emph{categorical}, others may be \emph{numeric}. Because decision tree induction is a part of supervised learning, one or more \emph{class labels} are also associated with each observation. If the output domain only consists of two classes, the task is called \emph{binary classification}. Otherwise it is called \emph{multiclass classification}.
+%TODO multi label, multi class, multi output
+
+%TODO tests, observations in node
+The \emph{purity} of a node is defined as the percentage of observations in that node that belong to the majority class. A \emph{pure node} is a node with 100\% purity.
+
 
 \section{Advantages and disadvantages} %motivation -> move to intro?
-\section{Comparison to other ML algos}
-\section{Math}
-\section{Splitting heuristics}
-\section{Stopping criteria}
-\section{Overfitting}
-\section{Extensions}
-% \section{Ensembles}
-%         Bagging
-%         Boosting
-\section{Conclusion}
+The popularity of decision trees can be attributes to a couple of factors~\cite{scikit-learn, murthy1998automatic, kotsiantis2007supervised}:
+\begin{enumerate}
+    \item Comprehensible: makes intuitive sense even for the uninitiated.
+    \item Transparent, as opposed to for example artificial neural networks
+    \item Easy to visualize tree (if number of nodes remains small)
+    \item Non-parametric, makes very few assumptions about data
+    \item No data normalization required
+    \item Handles both categorical and numeric data
+    \item Handles missing data elegantly %TODO missing values fix?
+    \item Fast training
+    \item Fast inference
+    \item Can process multi-output problems
+\end{enumerate}
 
-% Intro to DT
-%     Prerequisites & definitions
-%         categorical vs numeric
-%         pure nodes
-%         see Excel
-%         ==> don't explain at length what target audience already knows!
-%             focus on pruning, categorical/numerical
-%     Why use?
-%         comprehensible, learning speed, classification speed, few hyperparams, missing values easy {kotsiantis2007supervised}
-%             TODO missing values fix?
-%         note: fuzzy algorithm names (versioning)
-%         redundant attributes?
-%         interdependent/correlated attributes?
-%         noise resistance? ~ overfitting
+Of course decision tree induction algorithms are not perfect:
+\begin{enumerate}
+    \item Unstable: small modifications in training data can result in a completely different tree
+    \item Learning optimal trees is an NP-Complete problem~\cite{npcomplete}, so heuristics are used to find approximations
+    \item Prone to overfitting if not actively countered by adding early stopping criteria or an extra pruning step
+    \item Prone to bias when one class appears more much frequently in the training set than others.
+\end{enumerate}
 
-%scikit
-% Simple to understand and to interpret. Trees can be visualised.
-% Requires little data preparation. Other techniques often require data normalisation, dummy variables need to be created and blank values to be removed. Note however that this module does not support missing values.
-% The cost of using the tree (i.e., predicting data) is logarithmic in the number of data points used to train the tree.
-% Able to handle both numerical and categorical data. Other techniques are usually specialised in analysing datasets that have only one type of variable. See algorithms for more information.
-% Able to handle multi-output problems.
-% Uses a white box model. If a given situation is observable in a model, the explanation for the condition is easily explained by boolean logic. By contrast, in a black box model (e.g., in an artificial neural network), results may be more difficult to interpret.
-% Possible to validate a model using statistical tests. That makes it possible to account for the reliability of the model.
-% Performs well even if its assumptions are somewhat violated by the true model from which the data were generated.
+\section{Comparison to other ML algos} %TODO remove?
 
-% Decision-tree learners can create over-complex trees that do not generalise the data well. This is called overfitting. Mechanisms such as pruning (not currently supported), setting the minimum number of samples required at a leaf node or setting the maximum depth of the tree are necessary to avoid this problem.
-% Decision trees can be unstable because small variations in the data might result in a completely different tree being generated. This problem is mitigated by using decision trees within an ensemble.
-% The problem of learning an optimal decision tree is known to be NP-complete under several aspects of optimality and even for simple concepts. Consequently, practical decision-tree learning algorithms are based on heuristic algorithms such as the greedy algorithm where locally optimal decisions are made at each node. Such algorithms cannot guarantee to return the globally optimal decision tree. This can be mitigated by training multiple trees in an ensemble learner, where the features and samples are randomly sampled with replacement.
-% There are concepts that are hard to learn because decision trees do not express them easily, such as XOR, parity or multiplexer problems.
-% Decision tree learners create biased trees if some classes dominate. It is therefore recommended to balance the dataset prior to fitting with the decision tree.
+\section{A generic TDIDT algorithm}
+A typical TDIDT algorithm for classification consists of two phases: a grow phase and an optional prune phase. The grow phase requires three functions with fixed signatures: a test generation function, a splitting function and a stopping function. Historically, researchers presented their TDIDT algorithms with fixed functions. Because of the common interface it is now common to choose these functions \emph{\`{a} la carte}. One could try to evaluate the performance of each function separately, but choosing the best of each function does not guarantee a global optimum. Holistic tests must be performed to ensure the best configuration is chosen.
 
-%     Comparison to other ML algos
-%         works best on categorical features -> SVM, NN for numerical
-%     Math
-%         axis-aligned hyperrectangles
-%         optimal tree: NP-Complete {npcomplete}
-%         big O's -> scikit docs
-%     Splitting heuristics
-%         leaf, binary/n-ary
-%         distance: gini {cart} | info theory {shannon1948mathematical}: entropy, IG, IGR | chi²
-%         not all that important {cart} -> stopping criteria!
-%             same for attribute selection -> TODO more details
-%     Stopping criteria
-%     Overfitting
-%         Early stopping
-%         Pruning -> comprehensibility
+\subsection{Test generation}
+%attr selection > splitting
+
+\subsection{Splitting}
+Classic TDIDT algorithms work by recursively splitting nodes based on some optimal test $\tau \in \mathcal{T}$, the set of all possible tests. A heuristic called the splitting criterion is required to determine this $\tau$. A few such criteria have stood the test of time.
+
+\subsubsection{Purity}
+The perfect test $\tau^*$ creates a partition $\mathcal{S}_{\tau^*} = \{S_1, \ldots, S_k\}$ wherein each subset is pure, so optimizing for weighted average partition purity $p(\mathcal{S}_\tau)$ is a sensible first criterion.
+
+\begin{equation}
+    p(\mathcal{S}_\tau) = \sum_{S_i \in \mathcal{S}_\tau} \frac{|S_i|}{|S|} p(S_i)
+\end{equation}
+
+Here, $S = S_1 \cup \ldots \cup S_k$ and $p(S)$ is the set purity as described above.
+%can also be expressed as impurity instead using the same pattern as below
+
+\subsubsection{Entropy and information gain}
+In practice purity does not appear to work very well. That is why researchers came up with an alternative based on Shannon's information theory~\cite{shannon1948mathematical}. Quinlan used such metrics in many of his prominent algorithms such as ID3 and C4.5~\cite{id3ter, c45}, but it was already invented earlier for the Concept Learning System (CLS)~\cite{cls}. Define entropy (or missing information) of a variable $V$ with possible values $v_i$ and associated probabilities $p_i$ as follows:
+
+\begin{equation}
+    s(V) = - \sum_i p_i \log_2(p_i)
+\end{equation}
+
+The same concept can be applied to the class variable. Define the class entropy $s_C(S)$:
+
+\begin{equation}
+    s_C(S) = - \sum_c p(c) \log_2(p(c))
+\end{equation}
+
+where $p(c)$ is the probability that a random observation in $S$ belongs to class c. This value can be defined for any node, before splitting begins.
+
+Once we consider a specific partition, a similar definition can be given for each subset $S_i$:
+
+\begin{equation}
+    s_C(S_i) = - \sum_c p_i(c) \log_2(p_i(c))
+\end{equation}
+
+For the entropy of a partition $\mathcal{S}_\tau$, again use the weighted average entropy of its subsets:
+
+\begin{equation}
+    s_C(\mathcal{S}_\tau) = \sum_i \frac{|S_i|}{|S|} s_C(S_i)
+\end{equation}
+
+Finally, calculate the information gain $IG(\tau, S)$ of the split that resulted from test $\tau$:
+
+\begin{equation}
+    IG(\tau, S) = s_C(S) - s_C(\mathcal{S}_\tau)
+\end{equation}
+
+where $\mathcal{S}_\tau$ is the partition resulting from test $\tau$.
+
+\subsubsection{Gain ratio}
+The information gain criterion is biased towards tests with many possible outcomes. This could be a problem in non-binary trees. The gain ratio alleviates this problem. First define split information $SI(\tau, S)$ --- the maximum possible information gain --- as follows:
+
+\begin{equation}
+    SI(\tau, S) = - \sum_i \frac{|S_i|}{|S|} \log_2 \frac{|S_i|}{|S|}
+\end{equation}
+
+Finally, define the gain ratio:
+
+\begin{equation}
+    GR(\tau, S) = \frac{IG(\tau, S)}{SI(\tau, S)}
+\end{equation}
+%watch out for instability due to very low SI! -> only calculate when high enough
+
+In binary trees, this heuristic typically causes a less balanced tree compared to the information gain criterion~\cite{c45}.
+
+\subsubsection{Gini}
+Distance metrics such as the Gini impurity index can be used instead of heuristics based on information theory~\cite{cart}. The definitions follow the same pattern as those of the information gain:
+
+\begin{equation}
+    g(S) = \sum_c p(c)(1 - p(c))
+\end{equation}
+\begin{equation}
+    g(S_i) = \sum_c p_i(c)(1-p_i(c))
+\end{equation}
+\begin{equation}
+    g(\mathcal{S}_\tau) = \sum_i \frac{|S_i|}{|S|} g(S_i)
+\end{equation}
+\begin{equation}
+    Q(\tau, S) = g(S) - g(\mathcal{S}_\tau)
+\end{equation}
+
+% \subsubsection{Comparison}
+
+\subsection{Stopping}
+Breiman argues in his CART book~\cite{cart} that choosing good stopping criteria is far more important than choosing good splitting criteria. If early stopping was not applied or no pruning (see below) was performed afterwards, trees would grow excessively large on real world data sets. This is a classic case of overfitting. It negatively impacts many factors that make decision trees attractive in the first place, such as their comprehensibility and their fast training and inference. It is also detrimental to the performance of the model on unseen data since the model fails to generalize properly.
+
+Some simple stopping criteria are based on the depth of the tree, the purity of a node or the number of observations belonging to a node. 
+
+More complex stopping criteria are based on the Minimum Discription Length (MDL) of a tree~\cite{mdlstopping} or on statistical techniques such as a $\Xi^2$-test. Quilan proposed to use the latter in his ID3 algorithm but decided not to include it in the successor (C4.5)~\cite{id3ter, c45}.
+
+\subsection{Pruning}
+\cite{quinlan1987simplifying} %REP
+\cite{repanalysis}
+\cite{mdlpruning}
+\cite{backproppruning}
+\cite{mansour1997pessimistic}
+\cite{breslow1997simplifying}
+\cite{elomaa1999biases}
+\cite{mingers1989empirical}
+\cite{elomaa2001analysis} %REP
+\cite{esposito1997comparative}
+%         Pruning
+%             bottom up
 %             non-exhaustive
 %                 cost complexity pruning: {cart}
 %                 REP: {quinlan1987simplifying}
 %                 EBP: {?}
 %                 pessimistic: {quinlan1987simplifying, c45}
 %                 MDL: {quinlan1989inferring}
-%             easy to switch, but evaluate holistically
-%         greedy -> horizon
-%     Extensions
+%         greedy -> misses big picture
+
+\section{Extensions}
 %         Rules
 %             prune via rules
 %         Oblique (multivariate)
 %         Logic
+
+% \section{Ensembles}
+%         Bagging
+%         Boosting
+
+\section{Conclusion}
+
+%note: fuzzy algorithm names (versioning)
