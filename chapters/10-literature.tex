@@ -1,69 +1,51 @@
 \chapter{Literature review}\label{cha:literature}
-The relevant literature for this thesis mostly consists of papers concerning decision tree induction. These go back many decades, but fortunately there are some review and survey papers that provide a convenient overview~\cite{murthy1998automatic, rokach2005top, kotsiantis2007supervised}. On top of the classic literature, the source code and accompanying documentation of scikit-learn and Weka has also been a rich source of information.
+The relevant literature for this thesis mostly consists of papers concerning decision tree induction. These go back many decades, but fortunately there are some review and survey papers that provide a convenient overview~\cite{murthy1998automatic, rokach2005top, kotsiantis2007supervised}. On top of the academic literature, the source code and accompanying documentation of scikit-learn and Weka has also been a rich source of information.
 
 \section{Prerequisites}
-The reader ought to be familiar with basic machine learning concepts such as supervised learning, classification, regression, bias-variance trade-off, model validation and ensemble learning. Furthermore, basic knowledge of decision tree induction is expected. The most important basic concepts will be discussed briefly. Topics that are particularly important for the next chapters will be elaborated on.
+The reader ought to be familiar with basic machine learning concepts such as supervised learning, classification, regression, bias-variance trade-offs, model validation and ensemble learning. Furthermore, elementary knowledge of decision tree induction is expected. The most important basic concepts will be discussed briefly. Topics that are particularly important for the next chapters will be elaborated on.
 
 \section{Scope}
-A wide variety of decision tree induction algorithms exists. Here, only the \emph{top down induction of decision trees (TDIDT)} family is considered because it is the most common approach and it is particularly relevant to the software tools under scrutiny.
+A wide variety of decision tree induction algorithms exists. Here, only the \emph{top down induction of decision trees (TDIDT)} family is considered. It is the most common approach and it is particularly relevant to the software tools under scrutiny.
 
-Furthermore, only classification trees are considered. With little effort, most TDIDT classification algorithms can be converted to regression algorithms. Yet, these are far less popular and better alternatives such as Xgboost~\cite{xgboost} exist.
+Furthermore, only classification trees are considered. With little effort, most TDIDT classification algorithms can be converted to regression algorithms. Yet, these are far less popular and better alternatives such as XGBoost~\cite{xgboost} exist.
 
 Ensemble methods are also out of scope. Recent decision tree algorithms rarely work with a single tree, but rather with an ensemble of trees. Random forests~\cite{rf} is a very popular example of bootstrap aggregating or \emph{bagging}. Regardless, the scope of this thesis concerns the fundamentals of decision trees, and not their derivatives. Implementation improvements suggested in this thesis could still potentially benefit related ensemble methods.
 
 The algorithms in scope are all offline learning methods invented before the big data era. This implies that computation is done locally and that all data has to fit in memory. As such, online learning methods or distributed algorithms are out of scope.
 
-Finally, only univariate tests are in scope. The test performed in each internal node must only evaluate one attribute of the observation. For categorical attributes, this typically implies checking whether or not the input is equal to a fixed category. For numeric attributes, the input value is compared against a fixed threshold using $\leq$ or $>$. Consequently, the input space is partitioned recursively using axis-aligned hyperplanes. This scope limitation precludes well-known but seldom used extensions such as oblique trees.
+Finally, only univariate tests are in scope. The test performed in each internal node must only evaluate one attribute of the observation. For categorical attributes, this typically implies checking whether or not the input is equal to a fixed category. For numeric (and thus ordered) attributes, the input value is compared against a fixed threshold using the less than or equal and greater than operators. Consequently, the input space is partitioned recursively using axis-aligned hyperplanes. This scope limitation precludes well-known but seldom used extensions such as oblique trees.
+
+%TODO no rule generation
+%TODO no logic trees, model trees
 
 \section{Terminology}
-Throughout the relevant literature, there is a lack of ubiquitous vocabulary shared by all researchers. To avoid confusion, some basic terms are reviewed. A \emph{decision tree} consists of \emph{(internal) nodes} which are connected to other nodes via a one-to-many \emph{parent-child} relation on one hand, and \emph{leaves} which have no children on the other hand. The \emph{root node} is the only node without parent. In a \emph{binary tree}, the number of children per node is either zero or two.
+Throughout the relevant literature, there is a lack of ubiquitous vocabulary shared by all researchers. Decision trees are used in various scientific fields, each with its own jargon. Specifically, there is a big divide between researchers that approach the problem from a machine learning perspective compared to those who come from a statistics background. To avoid confusion, some basic terms are reviewed. A \emph{decision tree} consists of \emph{(internal) nodes} which are connected to other nodes via a one-to-many \emph{parent-child} relation on one hand, and \emph{leaves} which have no children on the other hand. The \emph{root node} is the only node without parent. In a \emph{binary tree}, all internal nodes have two children.
 
-Induction algorithms typically receive a \emph{training set} as input data to construct a decision tree while a \emph{test set} is used afterwards for model validation. These sets are tables of data where each row represents an \emph{observation}. All observation are fully described by a common set of \emph{attributes}. Some attributes are \emph{categorical}, others may be \emph{numeric}. Because decision tree induction is a part of supervised learning, one or more \emph{class labels} are also associated with each observation. If the output domain only consists of two classes, the task is called \emph{binary classification}. Otherwise it is called \emph{multiclass classification}.
-%TODO multi label, multi class, multi output
+Induction algorithms typically receive a \emph{training set} as input data to construct a decision tree while a \emph{test set} is used afterwards for model validation. These sets are tables of data where each row represents an \emph{observation}. All observation are fully described by a common set of \emph{attributes}. Some attributes are \emph{categorical}, others may be \emph{numeric}. Because decision tree induction is a part of supervised learning, one or more \emph{class labels} are also associated with each observation. If the total number of distinct class values equals two, the task is called \emph{binary classification}. Otherwise it is called \emph{multiclass classification}. \emph{Multilabel classification} occurs when one observation can be tagged with a variable number of class values at once. \emph{Multioutput classification} on the other hand occurs when multiple distinct classes, each with their own set of values, have to be derived from the same set of attributes. This can be accomplished trivially by creating multiple trees, each handling one class. Regardless, combining them in one tree might offer performance benefits. In a way, multilabel classification is a special case of multioutput classification. Decision trees are one of the few machine learning algorithms that can handle all these modes of operation natively.
 
-%TODO tests, observations in node
-The \emph{purity} of a node is defined as the percentage of observations in that node that belong to the majority class. A \emph{pure node} is a node with 100\% purity.
-
-
-\section{Advantages and disadvantages} %motivation -> move to intro?
-The popularity of decision trees can be attributes to a couple of factors~\cite{scikit-learn, murthy1998automatic, kotsiantis2007supervised}:
-\begin{enumerate}
-    \item Comprehensible: makes intuitive sense even for the uninitiated.
-    \item Transparent, as opposed to for example artificial neural networks
-    \item Easy to visualize tree (if number of nodes remains small)
-    \item Non-parametric, makes very few assumptions about data
-    \item No data normalization required
-    \item Handles both categorical and numeric data
-    \item Handles missing data elegantly %TODO missing values fix?
-    \item Fast training
-    \item Fast inference
-    \item Can process multi-output problems
-\end{enumerate}
-
-Of course decision tree induction algorithms are not perfect:
-\begin{enumerate}
-    \item Unstable: small modifications in training data can result in a completely different tree
-    \item Learning optimal trees is an NP-Complete problem~\cite{npcomplete}, so heuristics are used to find approximations
-    \item Prone to overfitting if not actively countered by adding early stopping criteria or an extra pruning step
-    \item Prone to bias when one class appears more much frequently in the training set than others.
-\end{enumerate}
-
-\section{Comparison to other ML algos} %TODO remove?
+During \emph{training}, first one root node is created and all observations in the training set are stored in this node. When a node is \emph{split} using some test function, that test partitions the observations in subsets and then creates a child node for each subset. This process is repeated recursively until some stopping citerium is reached. The \emph{purity} of a node is defined as the percentage of observations in that node that belong to the majority class. A \emph{pure node} is a node with 100\% purity.
 
 \section{A generic TDIDT algorithm}
 A typical TDIDT algorithm for classification consists of two phases: a grow phase and an optional prune phase. The grow phase requires three functions with fixed signatures: a test generation function, a splitting function and a stopping function. Historically, researchers presented their TDIDT algorithms with fixed functions. Because of the common interface it is now common to choose these functions \emph{\`{a} la carte}. One could try to evaluate the performance of each function separately, but choosing the best of each function does not guarantee a global optimum. Holistic tests must be performed to ensure the best configuration is chosen.
 
-\subsection{Test generation}
+\subsection{Univariate test generation}
+Based on the observations in a node, tests can be devised that spit those observations in a number of subsets. The goal of this step is to generate a finite number of tests $\tau_i \in \mathcal{T}$ based on one given attribute. Recall the tests based on multiple attributes exist but are out of scope. In the next step, one specific test is chosen from this set of possible tests.
+
+Generating tests for categorical attributes is trivial. For binary trees the value of the attribute is compared against one specific category. If it matches, it belongs to the first subset, else to the second. This results in as many tests as there are possible categories for the attribute. For non-binary trees, one test suffices that maps each distinct category to a specific subset.
+
+In the case of numeric, ordered attributes, threshold are introduced to partition the observations based on that ordering. That way, an infinite number of tests can be generated, which is of course undesireable. However, at least for the training data, not all tests will result in a different partitioning. A clever choice of thresholds should bring the number of subsets back to a manageable level.
 %attr selection > splitting
+
+%ignore: categorical attributes can have an implicit ordering
 
 \subsection{Splitting}
 Classic TDIDT algorithms work by recursively splitting nodes based on some optimal test $\tau \in \mathcal{T}$, the set of all possible tests. A heuristic called the splitting criterion is required to determine this $\tau$. A few such criteria have stood the test of time.
 
 \subsubsection{Purity}
-The perfect test $\tau^*$ creates a partition $\mathcal{S}_{\tau^*} = \{S_1, \ldots, S_k\}$ wherein each subset is pure, so optimizing for weighted average partition purity $p(\mathcal{S}_\tau)$ is a sensible first criterion.
+The perfect test $\tau^*$ creates a partition $\mathcal{S}_{\tau^*} = \{S_1, \ldots, S_k\}$ wherein each subset is pure, so optimizing for weighted average partition purity is a sensible first criterion.
 
 \begin{equation}
-    p(\mathcal{S}_\tau) = \sum_{S_i \in \mathcal{S}_\tau} \frac{|S_i|}{|S|} p(S_i)
+    p(\mathcal{S}_\tau) = \sum_i \frac{|S_i|}{|S|} p(S_i)
 \end{equation}
 
 Here, $S = S_1 \cup \ldots \cup S_k$ and $p(S)$ is the set purity as described above.
@@ -82,24 +64,24 @@ The same concept can be applied to the class variable. Define the class entropy 
     s_C(S) = - \sum_c p(c) \log_2(p(c))
 \end{equation}
 
-where $p(c)$ is the probability that a random observation in $S$ belongs to class c. This value can be defined for any node, before splitting begins.
+where $p(c)$ is the probability that a random observation in $S$ belongs to class c. This value can be defined for any node, independent of any specific partition.
 
-Once we consider a specific partition, a similar definition can be given for each subset $S_i$:
+For a given test $\tau$, a similar definition can be given for each subset $S_i$ of the induced partition on $S$:
 
 \begin{equation}
     s_C(S_i) = - \sum_c p_i(c) \log_2(p_i(c))
 \end{equation}
 
-For the entropy of a partition $\mathcal{S}_\tau$, again use the weighted average entropy of its subsets:
+For the entropy of the whole partition $\mathcal{S}_\tau$, again use the weighted average entropy of its subsets:
 
 \begin{equation}
     s_C(\mathcal{S}_\tau) = \sum_i \frac{|S_i|}{|S|} s_C(S_i)
 \end{equation}
 
-Finally, calculate the information gain $IG(\tau, S)$ of the split that resulted from test $\tau$:
+Finally, calculate the information gain $h_{IG}(\tau, S)$ of the split that resulted from test $\tau$:
 
 \begin{equation}
-    IG(\tau, S) = s_C(S) - s_C(\mathcal{S}_\tau)
+    h_{IG}(\tau, S) = s_C(S) - s_C(\mathcal{S}_\tau)
 \end{equation}
 
 where $\mathcal{S}_\tau$ is the partition resulting from test $\tau$.
@@ -114,7 +96,7 @@ The information gain criterion is biased towards tests with many possible outcom
 Finally, define the gain ratio:
 
 \begin{equation}
-    GR(\tau, S) = \frac{IG(\tau, S)}{SI(\tau, S)}
+    h_{GR}(\tau, S) = \frac{h_{IG}(\tau, S)}{SI(\tau, S)}
 \end{equation}
 %watch out for instability due to very low SI! -> only calculate when high enough
 
@@ -133,7 +115,7 @@ Distance metrics such as the Gini impurity index can be used instead of heuristi
     g(\mathcal{S}_\tau) = \sum_i \frac{|S_i|}{|S|} g(S_i)
 \end{equation}
 \begin{equation}
-    Q(\tau, S) = g(S) - g(\mathcal{S}_\tau)
+    h_G(\tau, S) = g(S) - g(\mathcal{S}_\tau)
 \end{equation}
 
 % \subsubsection{Comparison}
@@ -146,36 +128,31 @@ Some simple stopping criteria are based on the depth of the tree, the purity of 
 More complex stopping criteria are based on the Minimum Discription Length (MDL) of a tree~\cite{mdlstopping} or on statistical techniques such as a $\Xi^2$-test. Quilan proposed to use the latter in his ID3 algorithm but decided not to include it in the successor (C4.5)~\cite{id3ter, c45}.
 
 \subsection{Pruning}
-\cite{quinlan1987simplifying} %REP
-\cite{repanalysis}
-\cite{mdlpruning}
-\cite{backproppruning}
+A better alternative to early stopping criteria is to let the tree grow freely, and to prune it afterwards in a bottom-up fashion. Typically, the current performance of an internal node including its children is compared to what the performance would be if this node would be converted to a leaf. If it would preform better as a leaf, the children are pruned away. Many different pruning algorithms exists. What follows is a non-exhaustive list of common pruning approaches.
+
+\subsubsection{Reduced Error Pruning (REP)}
+Reduced Error Pruning is one of the most straightforward and statistically sound methods of pruning a tree~\cite{quinlan1987simplifying, repanalysis, elomaa2001analysis}. Instead of using the whole training set to grow the tree, some randomly chosen observations are withheld in a seperate validation set. This way, an unbiased estimate of the performance of (a part of) tree can be calculated.
+
+%TODO explain in more detail
+
+The disadvantage of this method is that less data is available for growing the tree, potentially negatively impacting this process. This downside is mitigated if training data is available in abundance.
+
+\subsubsection{Error Based Pruning (EBP)}
+Error Based Pruning is a technique used in C4.5~\cite{c45}. It does not require a separate validation set, so the full training set can be used to grow the tree. The downside of this is that this method is less statistically sound. An upper bound is calculated based on the observed error and that upper bound used instead in the performance calculation. %TODO elaborate
+
+\subsubsection{Cost Complexity Pruning (CCP)}
+Cost Complexity Pruning, used in the CART algorithm~\cite{cart}, takes another approach akin to regularization in classic optimization problems. It considers both the total measured error and a cost factor proportional to the size of the tree. If the error increases, but it is compensated for by a much smaller tree, the operation as a whole can still be considered positive.
+
+\subsubsection{Pessimistic Pruning}
 \cite{mansour1997pessimistic}
-\cite{breslow1997simplifying}
-\cite{elomaa1999biases}
-\cite{mingers1989empirical}
-\cite{elomaa2001analysis} %REP
-\cite{esposito1997comparative}
-%         Pruning
-%             bottom up
-%             non-exhaustive
-%                 cost complexity pruning: {cart}
-%                 REP: {quinlan1987simplifying}
-%                 EBP: {?}
-%                 pessimistic: {quinlan1987simplifying, c45}
-%                 MDL: {quinlan1989inferring}
-%         greedy -> misses big picture
+\cite{quinlan1987simplifying}
+\cite{c45}
 
-\section{Extensions}
-%         Rules
-%             prune via rules
-%         Oblique (multivariate)
-%         Logic
+\subsubsection{Others}
+Many other pruning algorithms exist~\cite{breslow1997simplifying, elomaa1999biases, mingers1989empirical, esposito1997comparative}. Some use the MDL concept~\cite{mdlpruning, quinlan1989inferring}. Others use a small neural network and backpropagation to find good pruning candidates~\cite{backproppruning}.
 
-% \section{Ensembles}
-%         Bagging
-%         Boosting
+\subsubsection{Alternative: Rule-based Pruning}
+An outlier in this list is rule-based pruning. Decistion trees can be converted to a series of if-then statements where the condition is a conjunctive clause. These statements can be further simplified to if-then-else statements and then optimized, which can be seen as an alternative form of pruning. The resulting model is no long a tree, but it can still approximate the underlying concept that the tree used to represent.
 
 \section{Conclusion}
-
-%note: fuzzy algorithm names (versioning)
+TDIDT algorithms are made up of different components, for each of which a number of alternatives are available. This makes them a very flexible tool with uses in a variety of settings. Popular algorithms such as C4.5 and CART are opiniated in the sense that they each propose one specific configuration of components. Fortunately, that does not stop algorithm implementers from offering more choice to their users, as shown in the next chapter. Note also that there is no single precise definition of ID3, C4.5 or CART. New insights were aquired over time and added to the solution, but the algorithm name rarely changed.
