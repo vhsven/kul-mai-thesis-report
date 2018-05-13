@@ -1,9 +1,46 @@
 \chapter{Software for decision tree induction}\label{cha:software}
-Intro
+Chapter \ref{cha:literature} briefly discussed the theoretical basics of decision trees. In this chapter, we consider applications of this theory in the form of two popular software libraries: Weka~\cite{eibe2016weka} and scikit-learn~\cite{scikit-learn}.
 
-%weka
-%scikit
+\section{Algorithmic perspective}
+The most important difference between the two libraries regarding decision trees is in the base algorithm they started from. The J48 algorithm in Weka is based on Quinlan's C4.5~\cite{c45}, while the \texttt{DecisionTreeClassifier} in scikit-learn used CART by Breiman~\cite{cart} as the foundation. This has a profound impact on the capabilities of both implementations. These capabilities are divided in categories and discussed one by one in the following subsections.
+
+\subsection{Structural capabilities}
+CART only supports binary trees, and the same applies for scikit's implementation. It is an option in J48, but the default settings generate non-binary trees. Binary trees are typically deeper than their non-binary counterparts, making the inference phase more computationally expensive. On the other hand, Elomaa et al.\ claim that the use of binary discretization with C4.5 needs about the half training time of using C4.5 multisplitting~\cite{elomaa1999general}. Note that this only impacts splits on categorical attributes; splits of numeric attributes are always binary.
+
+\subsection{Input capabilities}
+C4.5 and CART can both handle categorical and numeric attributes. Only the predecessor of C4.5 (i.e., ID3) was not capable of dealing with numeric values. J48 can also handle both just like its theoretical counterpart C4.5.
+
+Scikit-learn's implementation did not inherit the categorical input capabilities of CART. This is understandable from a software engineering perspective: scikit-learn is built on top of numpy~\cite{numpy} which itself is a numeric, scientific computing toolkit. The user can work around this issue by preprocessing the categorical data, using for example a \texttt{LabelEncoder}\footnote{\url{http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html}} to map each category onto a unique ID or a \texttt{OneHotEncoder}\footnote{\url{http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OneHotEncoder.html}} that introduces as many boolean dummy variables as there are categories where only one is active at any given category.
+
+Consider an example where an attribute Color contains three categories: Red, Green and Blue. By default Weka would generate a single test out of this attribute. Red would be mapped to the first child, green to the second and blue to the third. This is not possible in scikit-learn because it is based on CART which only generates binary trees. CART --- which can handle categorical attributes in theory --- would generate three tests instead for attribute $x$: $(x == \text{Red})$, $(x == \text{Green})$ and $(x == \text{Blue})$. Each test has a boolean output which decides whether to jump to the left or the right child. 
+
+In scikit-learn, the one-hot encoder would replace the Color attribute with three numeric dummy attributes: ColorRed, ColorGreen and ColorBlue. In this case, Red is represented as [1, 0, 0], Green as [0, 1, 0] and Blue as [0, 0, 1]. Because these are numeric attributes, the test generation function will try to find thresholds to partition the space. In this case, only one threshold somewhere between 0 and 1 (e.g., 0.5) is needed. As such, each dummy variable will cause the generation of one test: $(x \leqslant 0.5)$. Although the implementation is slightly different, there is a trivial isomorphism between these three tests and the three CART tests. Consequently, the semantics are preserved even though they are slightly obscured.
+
+Alternatively, the label encoder would replace this categorical attribute with a single numeric attribute with possible values 0, 1 and 2. This implies that there is an order among the colors, which is not supposed to be the case. Tests such as $(x \leqslant 1.5)$ could be generated. It is equivalent to $(x == \text{Red} \lor x == \text{Green})$. This rule is more expressive then what was possible so far. That looks positive at first, but not all logical combinations can be represention this way. Even worse, what can be represented depends entirely on the non-existent order of the original categorical variable. In short, this technique does not adhere to the original semantics and should not be used.
+
+In conclusion, the suggested workaround with the one-hot encoder is acceptable but that does not change the fact that it negatively impact two of the decision tree advantages we listed earlier in \autoref{cha:intro}: no data preparation required and excellent comprehensibility.
+
+%TODO missing values
+
+\subsection{Output capabilities}
+First, regression is not supported by C4.5 and consequently not a capability of Weka's J48. For this thesis regression is out of scope, but it is still an important point. Note however that Weka contains other decision tree algorithms, some of which do accomodate regression.
+
+%TODO multiclass, multilabel, multioutput
+
+\subsection{Splitting criteria}
+Another difference lies in the choice of splitting criteria. C4.5 and J48 support the typical criteria based on information theory such as information gain and gain ratio. CART and scikit-learn on the other hand both support information gain and the gini impurity index. Gain ratio is not included since it makes little sense for binary trees. The purity criterion is not implemented in any of the algorithms due to its poor performance.
+
+\subsection{Early stopping and pruning}
+As mentioned at the end of \autoref{cha:literature}, both C4.5 and CART seemingly have their favourite pruning algorithms. The former explicitly supports Error Based Pruning and Rule-based Pruning, while the latter favours Cost Complexity Pruning. J48, like C4.5, supports Error Based Pruning by default. Quinlan's other proposal, Reduced Error Pruning, is also an option. Rule based pruning is not supported, but Weka contains other rule based algorithms as an alternative. Of course the option not to prune at all is also available. In that case user can fall back on some very simple early stopping criteria such as the minimum number of samples per leaf before a split can happen.
+
+Surprisingly, scikit-learn did not follow Breiman's suggestion of implementing Cost Complexity Pruning. Instead, it opted for the inferior practice of using simplistic early stopping criteria such as a maximum tree depth or a minimum number of observations per node required to split it. This is by far the most significant difference between the two implementations.
+
+%TODO other early stopping options in Weka?
+
+\section{Software engineering perspective}
+From a practical point of view, the most obvious difference is that the former is written in Java and the latter in Python. This has implications that go beyond mere syntax. Weka is written in a traditional object-orient style of software engineering, while scikit-learn uses a more procedural style with some intermittent object oriented aspects spaced throughout the code. This choice of the scikit-learn developers was motivated by performance reasons, but on the other hand this makes the code harder to understand, maintain and extend. This effect is amplified by the fact that the code is not always pure Python; it also contains some Cython and C code.
 
 \section{Capabilities}
 
 \section{Conclusion}
+%next steps -> pruning + nominal
