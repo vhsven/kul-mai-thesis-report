@@ -1,0 +1,55 @@
+{
+    "spellright.groupDictionaries": false,
+    "spellright.language": "en-GB",
+    "latex-workshop.chktex.enabled": true,
+    "latex-workshop.chktex.args.active": [
+        "-wall",
+        "-n22",
+        "-n30",
+        "-n46",
+        "-e16",
+        "-q"
+    ],
+    "latex-workshop.chktex.args.root": [
+        "-wall",
+        "-n22",
+        "-n30",
+        "-n46",
+        "-e16",
+        "-q"
+    ],
+    "latex-workshop.latex.outputDir": "./",
+    "latex-workshop.latex.clean.enabled": true,
+    "latex-workshop.latex.recipes": [
+        {
+            "name": "pdflatex -> bibtex -> pdflatex*2",
+            "tools": [
+                "pdflatex",
+                "bibtex",
+                "pdflatex",
+                "pdflatex"
+            ]
+        }
+    ],
+    "latex-workshop.latex.clean.fileTypes": [
+        "**/*.aux",
+        "**/*.bbl",
+        "**/*.blg",
+        "**/*.idx",
+        "**/*.ind",
+        "**/*.lof",
+        "**/*.lot",
+        "**/*.out",
+        "**/*.toc",
+        "**/*.acn",
+        "**/*.acr",
+        "**/*.alg",
+        "**/*.glg",
+        "**/*.glo",
+        "**/*.gls",
+        "**/*.ist",
+        "**/*.fls",
+        "**/*.log",
+        "**/*.fdb_latexmk"
+    ],
+}
