@@ -1,5 +1,5 @@
 \chapter{Software for decision tree induction}\label{cha:software}
-Chapter \ref{cha:literature} briefly discussed the theoretical basics of decision trees. In this chapter, we consider applications of this theory in the form of two popular software libraries: Weka~\cite{eibe2016weka} and scikit-learn~\cite{scikit-learn}.
+Chapter~\ref{cha:literature} briefly discussed the theoretical basics of decision trees. In this chapter, we consider applications of this theory in the form of two popular software libraries: Weka~\cite{eibe2016weka} and scikit-learn~\cite{scikit-learn}.
 
 \section{Algorithmic perspective}
 The most important difference between the two libraries regarding decision trees is in the base algorithm they started from. The J48 algorithm in Weka is based on Quinlan's C4.5~\cite{c45}, while the \texttt{DecisionTreeClassifier} in scikit-learn used CART by Breiman~\cite{cart} as the foundation. This has a profound impact on the capabilities of both implementations. These capabilities are divided in categories and discussed one by one in the following subsections.
@@ -8,7 +8,7 @@ The most important difference between the two libraries regarding decision trees
 CART only supports binary trees, and the same applies for scikit-learn's implementation. It is an option in J48, but the default settings generate non-binary trees. Binary trees are typically deeper than their non-binary counterparts, making the inference phase more computationally expensive. On the other hand, Elomaa et al.\ claim that the use of binary discretization with C4.5 needs about the half training time of using C4.5 multisplitting~\cite{elomaa1999general}. Note that this only impacts splits on categorical attributes; splits of numeric attributes are always binary.
 
 \subsection{Input capabilities}
-C4.5 and CART can both handle categorical and numeric attributes. Only the predecessor of C4.5 (i.e., ID3) was not capable of dealing with numeric values. J48 can also handle both just like its theoretical counterpart C4.5.
+C4.5 and CART can both handle categorical and numeric attributes. The predecessor of C4.5 (i.e., ID3) was not capable of dealing with numeric values. J48 can also handle both just like its theoretical counterpart C4.5.
 
 Scikit-learn's implementation did not inherit the categorical input capabilities of CART. This is understandable from a software engineering perspective: scikit-learn is built on top of numpy~\cite{numpy} which itself is a numeric, scientific computing toolkit. The user can work around this issue by pre-processing the categorical data, using for example a \texttt{LabelEncoder}\footnote{\url{http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html}} to map each category onto a unique ID or a \texttt{OneHotEncoder}\footnote{\url{http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OneHotEncoder.html}} that introduces as many boolean dummy variables as there are categories where only one is active at any given category.
 
@@ -23,7 +23,7 @@ In conclusion, the suggested workaround with the one-hot encoder is acceptable b
 %TODO missing values
 
 \subsection{Output capabilities}
-First, regression is not supported by C4.5 and consequently not a capability of Weka's J48. For this thesis regression is out of scope, but it is still an important point. Note however that Weka contains other decision tree algorithms, some of which do accommodate regression.
+Regression is not supported by C4.5 and consequently not a capability of Weka's J48. For this thesis regression is out of scope, but it is still an important point. Note however that Weka contains other decision tree algorithms, some of which do accommodate regression.
 
 %TODO multiclass, multilabel, multioutput
 
@@ -31,7 +31,7 @@ First, regression is not supported by C4.5 and consequently not a capability of 
 Another difference lies in the choice of splitting criteria. C4.5 and J48 support the typical criteria based on information theory such as information gain and gain ratio. CART and scikit-learn on the other hand both support information gain and the Gini impurity index. Gain ratio is not included since it makes little sense for binary trees. The purity criterion is not implemented in any of the algorithms due to its poor performance.
 
 \subsection{Early stopping and pruning}
-As mentioned at the end of \autoref{cha:literature}, both C4.5 and CART seemingly have their favourite pruning algorithms. The former explicitly supports Error Based Pruning and Rule-based Pruning, while the latter favours Cost Complexity Pruning. J48, like C4.5, supports Error Based Pruning by default. Quinlan's other proposal, Reduced Error Pruning, is also an option. Rule based pruning is not supported, but Weka contains other rule based algorithms as an alternative. Of course the option not to prune at all is also available. In that case user can fall back on some very simple early stopping criteria such as the minimum number of samples per leaf before a split can happen.
+As mentioned at the end of \autoref{cha:literature}, both C4.5 and CART seemingly have their favourite pruning algorithms. The former explicitly supports Error Based Pruning and Rule-based Pruning, while the latter favours Cost Complexity Pruning. J48, like C4.5, supports Error Based Pruning by default. Quinlan's other proposal, Reduced Error Pruning, is also an option. Rule based pruning is not supported, but Weka contains other rule based algorithms as an alternative. Of course the option not to prune at all is also available. In that case users can fall back on some very simple early stopping criteria such as the minimum number of samples per leaf before a split can happen.
 
 Surprisingly, scikit-learn did not follow Breiman's suggestion of implementing Cost Complexity Pruning. Instead, it opted for the inferior practice of using simplistic early stopping criteria such as a maximum tree depth or a minimum number of observations per node required to split it. This is by far the most significant difference between the two implementations.
 

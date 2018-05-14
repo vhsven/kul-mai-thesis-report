@@ -1,19 +1,19 @@
 \chapter{Introduction}\label{cha:intro}
 
 \section{Context}
-Decision tree induction is one of the most well-known tools in the machine learning community. Most of the theoretical groundwork was laid in the last three decades of the previous century. Researchers Leo Breiman and Ross Quinlan have been particularly influential in this space. Some well-know algorithms include the Concept Learning System~\cite{cls}, ID3~\cite{id3, id3bis, id3ter} by Quinlan and Classification And Regression Trees (CART)~\cite{cart} by Breiman. 
+Decision tree induction is one of the most well-known tools in the machine learning community. Most of the theoretical groundwork was laid in the last three decades of the previous century. Researchers Leo Breiman and Ross Quinlan have been particularly influential in this space. Some well-know algorithms include the Concept Learning System (CLS)~\cite{cls}, ID3~\cite{id3, id3bis, id3ter} by Quinlan and Classification And Regression Trees (CART)~\cite{cart} by Breiman. 
 
-Contemporary AI researchers focus most of their attentions on neural networks and in particular deep learning --- the recent hype around DeepMind's AlphaGo~\cite{alphago} victories comes to mind --- but decision tree research is not dead. Researchers still continue to propose new or improved algorithms and analyses.
+Contemporary AI researchers focus most of their attention on neural networks and in particular deep learning --- the recent hype around DeepMind's AlphaGo~\cite{alphago} victories comes to mind --- but decision tree research is not dead. Researchers still continue to propose new or improved algorithms and analyses.
 
 Theory is one thing, but the algorithms need to be implemented as computer programs to actually be useful. Scikit-learn~\cite{scikit-learn} is a very popular machine learning library written in Python. As such, it also contains implementations of various decision tree induction algorithms. Before scikit-learn became popular, a Java-based library called Weka~\cite{eibe2016weka} (or ``Waikato Environment for Knowledge Analysis'' in full) was often used instead. Even today, the implementations of decision tree algorithms in Weka are still in many respects superior to those in scikit-learn. Other libraries that implement similar algorithms exist (e.g., Apache Spark~\cite{spark}), but those are beyond the scope of this text.
 
 \section{Goal}
 The goal of this thesis is to alleviate the discrepancies between scikit-learn and Weka concerning decision tree induction. Mind that decision tree induction tools can never be truly ``complete'' as stated in the title because the field is immensely broad and still continues to grow. Nevertheless, an effort can be made to improve feature parity between these two popular tools.
 
-One such discrepancy was found when comparing the performance of Weka and scikit-learn on an activity dataset~\cite{problematic_dataset}. The difference between classification accuracies in this case was considerable at about 25\% in favor of Weka.
+One such discrepancy was found when comparing the performance of decision tree induction algorithms in Weka and scikit-learn on an activity dataset~\cite{problematic_dataset}. The difference between classification accuracies in this case was considerable at about 25\% in favour of Weka.
 
 \section{Motivation}
-Some would perhaps question the relevance of such \emph{outdated} techniques anno 2018. This feeling is misguided. The advantages of decision tree induction algorithms are still hard to compete with, even for more modern algorithms~\cite{scikit-learn, murthy1998automatic, kotsiantis2007supervised}:
+Some would perhaps question the relevance of such ``outdated'' techniques anno 2018. This feeling is misguided. The advantages of decision tree induction algorithms are still hard to compete with, even for more modern algorithms~\cite{scikit-learn, murthy1998automatic, kotsiantis2007supervised}:
 
 \begin{enumerate}
     \item Comprehensible: makes intuitive sense even for the uninitiated.
@@ -36,8 +36,10 @@ Of course decision tree induction algorithms are not perfect:
     \item Prone to bias when one class appears more much frequently in the training set than others.
 \end{enumerate}
 
+Some of these drawbacks can be overcome by using an ensemble of decision trees, but that in turn negatively impacts some of the advantages.
+
 % Challenges?
 
 \section{Thesis structure}
-The structure of the remainder of this text is as follows. First, an overview of the literature study concerning decision tree induction will be presented. In particular the link between an implementation and its underlying algorithm will be clarified, including the effects of that choice on the capabilities of the tool.
-%TODO structure
+The structure of the remainder of this text is as follows. First, an overview of the literature study concerning decision tree induction will be presented and the scope of the thesis will be determined. Next, the decision tree implementations in Weka and scikit-learn are compared to their underlying algorithms and to each other. This results in a list of capabilities. Based on these differences in capabilities, we formulate some hypotheses that can explain the differences in performance. Chapter~\ref{cha:method} discusses experimental setups. It is followed by chapter~\ref{cha:results} which presents and discusses the results of these experiments. We conclude with chapter~\ref{cha:conclusion}.
+%TODO improve structure
