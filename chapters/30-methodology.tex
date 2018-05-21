@@ -4,4 +4,46 @@ Intro
 % Datasets + description
 % Architecture?
 
+\section{Datasets}
+To evaluate the models created by the new '\texttt{PruneableDecisionTreeClassifier}, they are tested on a variety of classification datasets. These datasets are primarily taken from \url{www.openml.org}~\cite{openml}. The \emph{activity} dataset on the other hand belongs to a study by Kwapisz et al.~\cite{problematic_dataset}. In this study, the activity of a test subject is guessed based on sensor data from cell phone accelerometers. The possible activities are walking, jogging, going upstairs, going downstairs, sitting and standing. Scikit-learn's regular \texttt{DecisionTreeClassifier} performed poorly on this set in the past, although Weka's J48 handled it well. Table \ref{tbl:datasets} gives an overview.
+
+\begin{table}
+\centering
+\begin{tabular}[htp]{ l l r r r l r }
+    Name & Description & C & F & N & M & CF \\ \hline
+    \href{http://www.cis.fordham.edu/wisdm/dataset.php}{activity} & Activity prediction & 6 & 45 & 5 424 & Yes & 1 \\
+    \href{https://www.openml.org/d/37}{diabetes} & Pima Indians Diabetes & 2 & 8 & 768 & No & 0 \\
+    \href{https://www.openml.org/d/59}{ionosphere} & Johns Hopkins Ionosphere & 2 & 34 & 351 & No & 0 \\
+    \href{https://www.openml.org/d/61}{iris} & Fisher's Iris & 3 & 4 & 150 & No & 0 \\
+    \href{https://www.openml.org/d/187}{wine} & Wine recognition & 3 & 13 & 178 & No & 0 \\
+    \href{https://www.openml.org/d/1510}{wdbc} & Breast Cancer Wisconsin & 2 & 30 & 569 & No & 0 \\
+\end{tabular}
+\caption{Overview of classification datasets. Column C indicates the number of classes, F the number of features (excluding the class feature), N the number of observations, M whether the datasets contains missing values and CF the number of categorical features (also excluding class).}%
+\label{tbl:datasets}
+\end{table}
+
+\section{Evaluation}
+%grid search:
+% param_grid = [
+%     {
+%         "prune": [None]
+%     },
+%     {
+%         "prune": [None],
+%         "min_samples_leaf": [0.5 / n_classes]
+%     },
+%     {
+%         "prune": ['rep'],
+%         "rep_test_percentage": [1/10, 1/5, 1/3, 1/2]
+%     },
+%     {
+%         "prune": ['ebp'],
+%         "ebp_confidence": [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1/20, 1/2]
+%     }
+% ]
+%RepeatedStratifiedKFold K=10 R=100
+%per tool per dataset, per prune method (+hyperparams):
+%n_nodes, n_leaves, accuracy, f1_weighted, fit_time, score_time (mean/std)
+%random_state / seed
+
 \section{Conclusion}
