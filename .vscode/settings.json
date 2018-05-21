@@ -4,6 +4,7 @@
     "latex-workshop.chktex.enabled": true,
     "latex-workshop.chktex.args.active": [
         "-wall",
+        "-n13",
         "-n22",
         "-n30",
         "-n46",
@@ -12,6 +13,7 @@
     ],
     "latex-workshop.chktex.args.root": [
         "-wall",
+        "-n13",
         "-n22",
         "-n30",
         "-n46",
