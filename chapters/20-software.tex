@@ -1,4 +1,4 @@
-\chapter{Software for decision tree induction}\label{cha:software}
+\chapter{Existing implementations}\label{cha:software}
 Chapter~\ref{cha:literature} briefly discussed the theoretical basics of decision trees. In this chapter, we consider applications of this theory in the form of two popular software libraries: Weka~\cite{eibe2016weka} and scikit-learn~\cite{scikit-learn}.
 
 \section{Capabilities}
@@ -9,6 +9,7 @@ CART only supports binary trees, and the same applies for scikit-learn's impleme
 
 \subsection{Input capabilities}
 \subsubsection{Categorical and numerical attributes}
+\label{sssec:cat_num_attr}
 ID3 was not capable of dealing with numerical attributes, but C4.5 and CART can handle both types. J48 can also handle both just like its theoretical counterpart C4.5. Scikit-learn's implementation however did not inherit the categorical input capabilities of CART. This is understandable from a software engineering perspective: scikit-learn is built on top of numpy~\cite{numpy} which itself is a numeric, scientific computing library. The user can work around this issue by pre-processing the categorical data, using for example a \texttt{LabelEncoder}\footnote{\url{http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.LabelEncoder.html}} to map each category onto a unique ID or a \texttt{OneHotEncoder}\footnote{\url{http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OneHotEncoder.html}} that introduces as many boolean dummy variables as there are categories where only one is active at any given category.
 
 Consider an example where an attribute Colour contains three categories: Red, Green and Blue. By default Weka would generate a single test out of this attribute. Red would be mapped to the first child, green to the second and blue to the third. This is not possible in scikit-learn because it is based on CART which only generates binary trees. CART --- which can handle categorical attributes in theory --- would generate three tests instead for attribute $x$: $(x == \text{Red})$, $(x == \text{Green})$ and $(x == \text{Blue})$. Each test has a boolean output which decides whether to jump to the left or the right child. 
@@ -47,6 +48,7 @@ Other discrepancies came up, but these were either minor or could be rationalize
 %misc.:
 %generate rulesets
 %class weights
+%misclassification costs
 
 %TODO move/delete?
 \section{Software engineering perspective}
