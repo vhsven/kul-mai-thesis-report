@@ -38,7 +38,7 @@ Master's thesis report for the Advanced Master in Artificial Intelligence progra
   * DecisionStump: max_depth=1 + boosting
   * HoeffdingTree: VFDT, online
   * J48: C4.5
-  * LMT: logistic model trees (LR at leafs)
+  * LMT: logistic model trees (LR at leaves)
   * M5P: M5 model tree
   * RandomForest
   * RandomTree: RF(n_estimators=1) or random max_features
@@ -47,7 +47,7 @@ Master's thesis report for the Advanced Master in Artificial Intelligence progra
 * Pruning algorithm applicable to regression trees?
 * Pruning: slower learning, faster prediction
 * Pruning
-  1. IG = LT heuristic, but near leafs purity matters more again
+  1. IG = LT heuristic, but near leaves purity matters more again
   2. purity on sample != purity on population
      * unbiased estimate needed -> validation set ==> reduced error pruning
 * Stopping criteria -> impure leaves -> predict_proba
@@ -75,16 +75,18 @@ Master's thesis report for the Advanced Master in Artificial Intelligence progra
 * `2017-12-24` - `2018-01-02` Unavailable (holidays)
 * `2018-01-30` Thesis meeting 2
 * `2018-02-13` Intermediate presentation
-* `2018-06-08 14h00` Thesis submission deadline
-  * N physical copies @ Secretariat CS (N = number of jury members + 1 (library) + 1 (self))
+* `2018-06-08 14h00` Digital thesis submission deadline
   * Digital copy @ <https://eng.kuleuven.be/english/students/master-thesis/masters-thesis/digital-masters-thesis-1>
-* `2018-06-27` - `2018-07-02` Defense
+* `2018-06-13` Physical thesis submission deadline
+  * N physical copies @ Secretariat CS (N = number of jury members + 1 (library) + 1 (self))
+  * Note: library version can be uploaded digitally on Toledo
+* `2018-06-27` - `2018-07-02` Defence
 * `2018-07-?? 15h00` Deliberation
 * `2018-07-?? 16h00` Proclamation & reception @ Arenberg Castle <https://wms.cs.kuleuven.be/cs/opleidingen/master-artificial-intelligence/MAI_SIP/proclamation-dates>
 
 ---
 
 * `2018-08-17 14h00` Thesis submission deadline
-* `2018-09-05`-`2018-09-10` Defense
+* `2018-09-05`-`2018-09-10` Defence
 * `2018-09-?? 15h00` Deliberation
 * `2018-09-?? 16h00` Proclamation & reception @ Arenberg Castle

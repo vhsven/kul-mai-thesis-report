@@ -1,42 +1,107 @@
 \chapter{Literature review}\label{cha:literature}
-The relevant literature for this thesis mostly consists of papers concerning decision tree induction. These go back many decades, but fortunately there are some review and survey papers that provide a convenient overview~\cite{murthy1998automatic, rokach2005top, kotsiantis2007supervised}. On top of the academic literature, the source code and accompanying documentation of scikit-learn and Weka has also been a rich source of information.
+The relevant literature for this thesis mostly consists of papers concerning decision tree induction. These go back many decades, but fortunately there are some review and survey papers that provide a convenient overview~\cite{murthy1998automatic, rokach2005top, kotsiantis2007supervised}. On top of the academic literature, the source code and accompanying documentation of scikit-learn and Weka have also been a rich source of information.
 
 \section{Prerequisites}
-The reader ought to be familiar with basic machine learning concepts such as supervised learning, classification, regression, bias-variance trade-offs, model validation and ensemble learning. Furthermore, elementary knowledge of decision tree induction is expected. The most important basic concepts will be discussed briefly. Topics that are particularly important for the next chapters will be elaborated on.
+The reader ought to be familiar with basic machine learning concepts such as supervised learning, classification, regression, overfitting, model validation and ensemble learning. Furthermore, elementary knowledge of decision tree induction is expected. The most important basic concepts will briefly be recapitulated. Topics that are particularly important for the next chapters will be elaborated on.
 
 \section{Scope}
 A wide variety of decision tree induction algorithms exists. Here, only the \emph{top down induction of decision trees (TDIDT)} family is considered. It is the most common approach and it is particularly relevant to the software tools under scrutiny.
 
-Unsupervised and semi-supervised algorithms are out of scope, as is online learning. Furthermore, only classification trees are considered. With little effort, most TDIDT classification algorithms can be converted to regression algorithms. Yet, these are far less popular and better alternatives such as XGBoost~\cite{xgboost} exist.
+Unsupervised and semi-supervised algorithms are out of scope. Furthermore, only classification trees are considered. With little effort, most TDIDT classification algorithms can be converted to regression algorithms. Yet, these are far less popular and better alternatives such as XGBoost~\cite{xgboost} exist.
 
-Ensemble methods are also out of scope. Recent decision tree algorithms rarely work with a single tree, but rather with an ensemble of trees. Random forests~\cite{rf} is a very popular example of bootstrap aggregating or \emph{bagging}. Regardless, the scope of this thesis concerns the fundamentals of decision trees, and not their derivatives. Implementation improvements suggested in this thesis could still potentially benefit related ensemble methods.
+Ensemble methods are also out of scope. Recent decision tree algorithms rarely work with a single tree, but rather with an ensemble of relatively simple trees. Random forests~\cite{rf} is a very popular example of bootstrap aggregating or \emph{bagging}. Regardless, the scope of this thesis concerns the fundamentals of decision trees, and not their derivatives. On the other hand, implementation improvements suggested in this thesis can potentially benefit related ensemble methods.
 
-The algorithms in scope are all offline learning methods invented before the big data era. This implies that computation is done locally and that all data has to fit in memory. As such, online learning methods or distributed algorithms are out of scope.
+The algorithms in scope are all offline learning methods. This is also known as batch learning. It implies that all computation is done in one place and that all data has to fit in memory. Online learning has gained relevance in the big data era since it does not impose such restrictions. On the other hand, the technique is only used if the context requires it because the performance is not up to par with offline learning.
 
-Finally, only univariate tests are in scope. The test performed in each internal node must only evaluate one attribute of the observation. For categorical attributes, this typically implies checking whether or not the input is equal to a fixed category. For numerical (and thus ordered) attributes, the input value is compared against a fixed threshold using the less than or equal and greater than operators. Consequently, the input space is partitioned recursively using axis-aligned hyperplanes. This scope limitation precludes well-known but seldom used extensions such as oblique trees.
+Finally, only univariate tests are in scope. The test performed in each internal node must only evaluate one attribute of the observation. For categorical attributes, this typically implies checking whether or not the input is equal to a fixed category. For numerical (and thus ordered) attributes, the input value is compared against a fixed threshold using the less than or equal operator. Consequently, the input space is partitioned recursively using axis-aligned hyperplanes. This scope limitation precludes well-known but unpopular extensions such as oblique trees.
 
 %TODO no rule generation
 %TODO no logic trees, model trees
 
 \section{Terminology}
-Throughout the relevant literature, there is a lack of ubiquitous vocabulary shared by all researchers. Decision trees are used in various scientific fields, each with its own jargon. Specifically, there is a big divide between researchers that approach the problem from a machine learning perspective compared to those who come from a statistics background. To avoid confusion, some basic terms are reviewed. A \emph{decision tree} consists of \emph{(internal) nodes} which are connected to other nodes via a one-to-many \emph{parent-child} relation on one hand, and \emph{leaves} which have no children on the other hand. The \emph{root node} is the only node without parent. In a \emph{binary tree}, all internal nodes have two children.
+Throughout the relevant literature, there is a lack of ubiquitous vocabulary shared by all researchers. Decision trees are used in various scientific fields, each with its own jargon. Specifically, there is a big divide between researchers that approach the problem from a machine learning perspective compared to those who come from a statistics background. To avoid confusion, we avoid synonyms and always use the same term for the same concept. In the following paragraphs, some basic terms are reviewed. 
 
-Induction algorithms typically receive a \emph{training set} as input data to construct a decision tree while a \emph{test set} is used afterwards for model validation. These sets are tables of data where each row represents an \emph{observation}. All observation are fully described by a common set of \emph{attributes}. Some attributes are \emph{categorical}, others may be \emph{numeric}.\footnote{The latter is sometimes also referred to as \emph{ordered} because this is the underlying property of numbers the algorithm will use at some point. Strictly speaking categories can also have an implicit order. In that case, a good practice is to make this explicit and to convert each category to a unique number beforehand.} In a supervised learning context, one or more \emph{class labels} are also associated with each observation. If the total number of distinct class values equals two, the task is called \emph{binary classification}. Otherwise it is called \emph{multiclass classification}. \emph{Multilabel classification} occurs when one observation can be tagged with a variable number of class values at once. \emph{Multioutput classification} on the other hand occurs when multiple distinct classes, each with their own set of values, have to be derived from the same set of attributes. This can be accomplished trivially by creating multiple trees, each handling one class. Regardless, combining them in one tree might offer performance benefits. In a way, multilabel classification is a special case of multioutput classification. Decision trees are one of the few machine learning algorithms that can handle all these modes of operation natively.
+A \emph{decision tree} consists of \emph{(internal) nodes} which are connected to other nodes via a one-to-many \emph{parent-child} relation on one hand, and \emph{leaves} which have no children on the other hand. The \emph{root node} is the only node without parent. In a \emph{binary tree}, all internal nodes have two children.
+
+Induction algorithms typically receive a \emph{training set} as input data to construct a decision tree while a \emph{test set} is used afterwards for model validation. These sets are tables of data where each row represents an \emph{observation}. All observation are fully described by a common set of \emph{attributes}. Some attributes are \emph{categorical}, others may be \emph{numerical}.\footnote{The latter is sometimes also referred to as \emph{ordered} because this is the underlying property of numbers the algorithm will exploit at some point. Strictly speaking categories can also have an implicit order. In that case, a good practice is to make this explicit by numerically encoding them beforehand.} In a supervised learning context, one or more \emph{target attributes} are present. For classification tasks, target attributes are considered categorical even if they contain numeric data. The distinct values of a target attribute are called the \emph{class labels} of that attribute. A classification task is called \emph{binary classification} if there is exactly one target attribute which has exactly two associated class labels and each observation is associated with exactly one of the two class labels. If multiple class labels can be associated with an observation, the task is called \emph{multilabel classification}. If instead there are more than two class labels, it is referred to as \emph{multiclass classification}. \emph{Multioutput classification} on the other hand occurs when multiple target attributes, each with their own distinct set of class labels, have to be derived from the same set of (non-target) attributes. This can be accomplished trivially by creating multiple trees, each handling one class. However, combining them in one tree might offer performance benefits. Decision trees are one of the few machine learning algorithms that can handle all these modes of operation natively.
 
 During \emph{training}, first one root node is created and all observations in the training set are stored in this node. When a node is \emph{split} using some \emph{test function}, this function partitions the observations in subsets and then creates a child node for each subset. This process is repeated recursively until some stopping criterion is reached. The \emph{purity} of a node is defined as the percentage of observations in that node that belong to the majority class. A \emph{pure node} is a node with 100\% purity.
 
 \section{A generic TDIDT algorithm}
-A typical TDIDT algorithm for classification consists of two phases: a grow phase and an optional prune phase. The grow phase requires three subroutines with fixed signatures: a test generation function, a splitting function and a stopping function. Historically, researchers presented their TDIDT algorithms with fixed subroutines. Because of the common interface it is now common to choose these functions \emph{\`{a} la carte}. One could try to evaluate the performance of each function separately, but choosing the best of each function does not guarantee a global optimum. Holistic tests must be performed to ensure the best configuration is chosen. Also note that the efficacy of each combination seems to depend on the domain in which it is applied~\cite{mingers1989empirical}.
+A typical TDIDT algorithm for classification consists of two phases: a grow phase and an optional prune phase. The grow phase requires three subroutines with fixed signatures: a test generation subroutine, a node splitting subroutine and a stopping subroutine. Historically, researchers presented their TDIDT algorithms with fixed subroutines. Because of the shared interface it is now common to choose these subroutines \emph{\`{a} la carte}. One could try to evaluate the performance of each subroutine separately, but selecting the best subroutine for each slot separately does not guarantee a global optimum. Holistic tests must be performed to ensure the best configuration is chosen. Also note that the efficacy of each combination seems to depend on the domain in which it is applied~\cite{mingers1989empirical}.
 
 \subsection{Univariate test generation}
-Based on the observations in a node, tests can be devised that spit those observations in a number of subsets. The goal of this step is to generate a finite number of tests $\tau_i \in \mathcal{T}$ based on one given attribute. Recall the tests based on multiple attributes exist but are out of scope. In the next step, one specific test is chosen from this set of possible tests.
+Based on the set of observations in a node, tests can be devised that partition this set in a number of subsets. The goal of this step is to generate a finite number of tests $\tau_i \in \mathcal{T}$ based on one associated attribute. Recall the tests based on multiple attributes exist but are out of scope. In the next step, one specific test is chosen from this set of possible tests.
 
-Generating tests for categorical attributes is trivial. For binary trees the value of the attribute is compared against one specific category. If it matches, it belongs to the first subset, else to the second. This results in as many tests as there are possible categories for the attribute. For non-binary trees, one test suffices that maps each distinct category to a specific subset.
+Generating tests for categorical attributes is trivial. For binary trees, each test compares its input (i.e., the value of the associated attribute of an observation) against one fixed value selected from all known values of the associated attribute. If the test is positive, the observation belongs to the first subset, else to the second. This results in as many tests as there are possible values for the associated attribute. For non-binary trees, one test suffices that maps each distinct attribute value to a specific subset. Figures~\ref{fig:categorical_binsplit} and \ref{fig:categorical_split} illustrate the difference. Non-binary trees are typically shallower and thus faster to go through from top to bottom during the inference phase. On the other hand, it is an all-or-nothing approach. If an attributes contains 100 different categories where only a few of them are very relevant, is it worth it to add 100 child nodes to the current node? Binary trees have more flexibility in this regard, but they pay for it in depth.
 
-In the case of numeric, ordered attributes, threshold are introduced to partition the observations based on that ordering. That way, an infinite number of tests can be generated, which is of course undesirable. However, at least for the training data, not all tests will result in a different partitioning. A clever choice of thresholds should bring the number of subsets back to a manageable level.
+\begin{figure}[htp]
+\begin{center}
+    \begin{tikzpicture}
+        [
+            boxed/.style         = {shape=rectangle, draw, align=center},
+            sibling distance        = 10em,
+            level distance          = 6em,
+            edge from parent/.style = {draw, -latex},
+            every node/.style       = {font=\footnotesize},
+            ]
+            \node [boxed] {Colour is Red?}
+            child { node [boxed] {\ldots} edge from parent node [left] {True} }
+            child { node [boxed] {Colour is Green?}
+            child { node [boxed] {\ldots} edge from parent node [left] {True} }
+            child { node [boxed] {\ldots} edge from parent node [right] {False} }
+            edge from parent node [right] {False} 
+            };
+        \end{tikzpicture}
+    \end{center}
+    \caption{Example of nodes that perform binary tests associated with the attribute Colour. Two levels are needed to reach the same conclusion as in figure~\ref{fig:categorical_split}. Of course in practice not every value is equally relevant, so it is difficult to make statements about which approach is better without knowing the context.}%
+    \label{fig:categorical_binsplit}
+\end{figure}
+    
+\begin{figure}[htp]
+\begin{center}
+    \begin{tikzpicture}
+        [
+            boxed/.style         = {shape=rectangle, draw, align=center},
+            sibling distance        = 10em,
+            level distance          = 6em,
+            edge from parent/.style = {draw, -latex},
+            every node/.style       = {font=\footnotesize},
+            % every node/.style = {shape=rectangle, draw, align=center}
+            % sloped
+        ]
+        \node [boxed] {Colour}
+            child { node [boxed] {\ldots} edge from parent node [left] {Is Red?} }
+            child { node [boxed] {\ldots} edge from parent node [left] {Is Green?} }
+            child { node [boxed] {\ldots} edge from parent node [right] {Is Blue?} };
+    \end{tikzpicture}
+\end{center}
+\caption{Example of a node that performs a test associated with the attribute Colour. Since this target attributes contains three distinct class labels, the observations are partitioned over three child nodes.}%
+\label{fig:categorical_split}
+\end{figure}
+
+In the case of numerical attributes, thresholds are introduced to partition the observations based on the implied ordering. That way, an infinite number of tests can be generated, which is of course undesirable. However, at least for the training data, not all tests will result in a different partitioning. A clever choice of thresholds should bring the number of subsets back to a manageable level. Figure~\ref{fig:numerical_split} shows an example.
+
+\begin{figure}[htp]%
+\label{fig:numerical_split}
+\begin{center}
+    \begin{tikzpicture}
+        [
+            boxed/.style         = {shape=rectangle, draw, align=center},
+            sibling distance        = 10em,
+            level distance          = 6em,
+            edge from parent/.style = {draw, -latex},
+            every node/.style       = {font=\footnotesize},
+        ]
+        \node [boxed] {Height $\leqslant 180$cm?}
+            child { node [boxed] {\ldots} edge from parent node [left] {True} }
+            child { node [boxed] {\ldots} edge from parent node [right] {False} };
+    \end{tikzpicture}
+\end{center}
+\caption{Example of a node that performs a test associated with the numeric attribute Height. In this case a threshold of 180cm was chosen, but of course any threshold is allowed as long as it divides the set of all height values in two non-empty subsets.}
+\end{figure}
+
 %attribute selection > splitting
-
-%ignore: categorical attributes can have an implicit ordering
 
 \subsection{Splitting}
 Classic TDIDT algorithms work by recursively splitting nodes based on some optimal test $\tau \in \mathcal{T}$, the set of all possible tests. A heuristic called the splitting criterion is required to determine this $\tau$. A few such criteria have stood the test of time.
@@ -120,8 +185,8 @@ Distance metrics such as the Gini impurity index can be used instead of heuristi
 
 % \subsubsection{Comparison}
 
-\subsection{Stopping}
-Breiman argues in his CART book~\cite{cart} that choosing good stopping criteria is far more important than choosing good splitting criteria. If early stopping was not applied or no pruning (see below) was performed afterwards, trees would grow excessively large on real world data sets. This is a classic case of overfitting. It negatively impacts many factors that make decision trees attractive in the first place, such as their comprehensibility and their fast training and inference. It is also detrimental to the performance of the model on unseen data since the model fails to generalize properly.
+\subsection{Early stopping}
+Breiman argues in his CART book~\cite{cart} that choosing good early stopping criteria is far more important than choosing good splitting criteria. If early stopping was not applied or no pruning (see below) was performed afterwards, trees would grow excessively large on real world data sets. This is a classic case of overfitting. It negatively impacts many factors that make decision trees attractive in the first place, such as their comprehensibility and their fast training and inference. It is also detrimental to the performance of the model on unseen data since the model fails to generalize properly.
 
 There are simple and more complex stopping criteria. Simples ones are based on features such as these:
 \begin{enumerate}
@@ -131,18 +196,18 @@ There are simple and more complex stopping criteria. Simples ones are based on f
     \item purity of a node
 \end{enumerate}
 
-More complex stopping criteria are based on the Minimum Description Length (MDL) of a tree~\cite{mdlstopping} or on statistical techniques such as a $\chi^2$-test. Quinlan proposed to use the latter in his ID3 algorithm but decided not to include it in the successor (C4.5)~\cite{id3ter, c45}.
+More complex stopping criteria can be based on the Minimum Description Length (MDL) of a tree~\cite{mdlstopping} or on statistical techniques such as a $\chi^2$-test. Quinlan proposed to use the latter in his ID3 algorithm but decided not to include it in the successor C4.5~\cite{id3ter, c45} due to its unreliability.
 
 \subsection{Pruning}
 A better alternative to early stopping criteria is to let the tree grow freely, and to prune it afterwards in a bottom-up fashion. Typically, the current error estimate of the subtree rooted at the given node is compared to what the estimated error would be if this node was converted to a leaf by pruning away its descendants. If it would perform better as a leaf, the descendants are effectively pruned away. Many different pruning algorithms exists. What follows is a non-exhaustive list of common pruning approaches.
 
-\subsubsection{Reduced Error Pruning (REP)}
-Reduced Error Pruning is one of the most straightforward and statistically sound methods of pruning a tree~\cite{quinlan1987simplifying, repanalysis}. Instead of using the whole training set to grow the tree, some randomly chosen observations are withheld in a separate validation set. By using this validation set after the growth phase is completed, an unbiased estimate of the error of each node in the tree can be calculated. Nodes at the bottom of the tree are converted into leaves if the estimated error of the leaf is equal to or less than the estimated error of the subtree rooted at the given node. This process is repeated recursively until the smallest possible tree is obtained with the minimum estimated error based on the validation set.
+\subsubsection{Reduced Error Pruning}
+Reduced Error Pruning (REP) is one of the most straightforward and statistically sound methods of pruning a tree~\cite{quinlan1987simplifying, repanalysis}. Instead of using the whole training set to grow the tree, some randomly chosen observations are withheld in a separate validation set. By using this validation set after the growth phase is completed, an unbiased estimate of the error of each node in the tree can be calculated. Nodes at the bottom of the tree are converted into leaves if the estimated error of the leaf is equal to or less than the estimated error of the subtree rooted at the given node. This process is repeated recursively until the smallest possible tree is obtained with the minimum estimated error based on the validation set.
 
 The disadvantage of this method is that less data is available for growing the tree, potentially negatively impacting this process. This is not a concern if training data is available in abundance.
 
-\subsubsection{Error Based Pruning (EBP)}
-Error Based Pruning is a technique used in C4.5~\cite{c45}. It does not require a separate validation set, so the full training set can be used to grow the tree. The downside of this is that this method is less statistically sound. An upper bound is calculated based on the training error and that upper bound is used instead of the original error in comparisons. Generally speaking: if a node is associated with fewer observations, then there is less certainty about the error and the upper bound will be further away from the original value. %TODO elaborate
+\subsubsection{Error Based Pruning}
+Error Based Pruning (EBP) is a technique used in C4.5~\cite{c45}. It does not require a separate validation set, so the full training set can be used to grow the tree. The downside of this is that this method is less statistically sound. An upper bound is calculated based on the training error and that upper bound is used instead of the original error in comparisons. Generally speaking: if a node is associated with fewer observations, then there is less certainty about the error and the upper bound will be further away from the original value. %TODO elaborate
 
 \subsubsection{Cost Complexity Pruning}
 Cost Complexity Pruning, used in the CART algorithm~\cite{cart}, takes another approach akin to regularization in classic optimization problems. First, it generates a series of pruned trees based on the original. Then it considers both the total training error and a cost factor proportional to the size of each tree to make a first selection. If the training error increases due to the pruning, but it is compensated for by a much smaller tree, the operation as a whole can still be considered positive depending on a trade-off factor. The final tree is chosen from this first selection using a separate validation set. As such, the same drawbacks apply here as for Reduced Error Pruning.

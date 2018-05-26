@@ -1,11 +1,11 @@
 \chapter{Introduction}\label{cha:intro}
 
 \section{Context}
-Decision tree induction is one of the most well-known tools in the machine learning community. Most of the theoretical groundwork was laid in the last three decades of the previous century. Researchers Leo Breiman and Ross Quinlan have been particularly influential in this space. Some well-know algorithms include the Concept Learning System (CLS)~\cite{cls}, ID3~\cite{id3, id3bis, id3ter} by Quinlan and Classification And Regression Trees (CART)~\cite{cart} by Breiman. 
+Decision tree induction is one of the most well-known tools in the machine learning community. Most of the theoretical groundwork was laid in the last three decades of the previous century. Researchers Leo Breiman and Ross Quinlan have been particularly influential in this space. Some well-know algorithms include the Concept Learning System (CLS)~\cite{cls} and ID3~\cite{id3, id3bis, id3ter} by Quinlan, and Classification And Regression Trees (CART)~\cite{cart} by Breiman. 
 
-Contemporary AI researchers focus most of their attention on neural networks and in particular deep learning --- the recent hype around DeepMind's AlphaGo~\cite{alphago} victories comes to mind --- but decision tree research is not dead. Researchers still continue to propose new or improved algorithms and analyses.
+Contemporary AI researchers focus a lot of their attention on neural networks and in particular deep learning --- the recent hype around DeepMind's AlphaGo~\cite{alphago} victories comes to mind. Nevertheless, a quick Google Scholar search will reveal that decision tree research is not dead. Researchers still continue to propose new or improved algorithms and analyses.
 
-Theory is one thing, but the algorithms need to be implemented as computer programs to actually be useful. Scikit-learn~\cite{scikit-learn} is a very popular machine learning library written in Python. As such, it also contains implementations of various decision tree induction algorithms. Before scikit-learn became popular, a Java-based library called Weka~\cite{eibe2016weka} (or ``Waikato Environment for Knowledge Analysis'' in full) was often used instead. Even today, the implementations of decision tree algorithms in Weka are still in many respects superior to those in scikit-learn. Other libraries that implement similar algorithms exist (e.g., Apache Spark~\cite{spark}), but those are beyond the scope of this text.
+Theory is one thing, but the algorithms need to be implemented as computer programs to actually be useful. Scikit-learn~\cite{scikit-learn} is a very popular machine learning library written in Python. As such, it also contains implementations of various decision tree induction algorithms. Before scikit-learn became popular, a Java-based library called Weka~\cite{eibe2016weka} (or ``Waikato Environment for Knowledge Analysis'' in full) was often used instead. The implementations of decision tree algorithms in Weka are to this day still in many respects superior to those in scikit-learn. Other libraries that implement similar algorithms exist (e.g., Apache Spark~\cite{spark}), but those are beyond the scope of this text.
 
 \section{Goal}
 The goal of this thesis is to alleviate the discrepancies between scikit-learn and Weka concerning decision tree induction. Mind that decision tree induction tools can never be truly ``complete'' as stated in the title because the field is immensely broad and still continues to grow. Nevertheless, an effort can be made to improve feature parity between these two popular tools.
@@ -18,8 +18,8 @@ Some would perhaps question the relevance of such ``outdated'' techniques anno 2
 \begin{enumerate}
     \item Comprehensible: makes intuitive sense even for the uninitiated.
     \item Transparent, as opposed to for example artificial neural networks
-    \item Easy to visualize tree (if number of nodes remains small)
-    \item Non-parametric, makes very few assumptions about data
+    \item Easy to visualize (if number of nodes remains small)
+    \item Non-parametric: makes very few assumptions about data
     \item No data normalization required
     \item Handles both categorical and numerical data
     \item Handles missing data elegantly %TODO missing values fix?

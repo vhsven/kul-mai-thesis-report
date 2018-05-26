@@ -51,9 +51,19 @@ To evaluate the models created by the new '\texttt{PruneableDecisionTreeClassifi
 %         "ebp_confidence": [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1/20, 1/2]
 %     }
 % ]
-%RepeatedStratifiedKFold K=10 R=100
-%per tool per dataset, per prune method (+hyperparams):
+%RepeatedStratifiedKFold K=10 R=10, dataset first
+%per tool per dataset, per prune method (+hyperparameters):
 %n_nodes, n_leaves, accuracy, f1_weighted, fit_time, score_time (mean/std)
 %random_state / seed
 
 \section{Conclusion}
+
+% scikit: no categorical input
+%   cannot be fixed (based on numpy) without complete rewrite
+% also: scikit = binary trees
+%   cannot be fixed without complete rewrite (and Breiman says it's OK)
+%   TODO verify in Weka whether it would make a difference
+% current workaround: one-hot encoding
+%   isomorphic to binary trees Weka would generate (except = instead of <)
+%   both performance on hardware level is same
+%   TODO verify hypothesis in Weka with and without encoding (all binary)
