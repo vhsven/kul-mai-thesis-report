@@ -1,9 +1,5 @@
 \chapter{Implementation extensions}\label{cha:software_new}
-In the previous chapter, we found three important features that scikit-learn lacks in comparison to Weka's J48 implementation. The first issue, pruning, is particularly noteworthy because the proposed workarounds (i.e., early stopping criteria) have been clearly established in the literature to be inferior. The other two issues (problems with categorical attributes and missing values) are of a lower priority because easy workarounds exist. They will be dealt with later on.
-
-%TODO chapter structure
-
-The implementation is hosted at \url{https://github.com/vhsven/vhsven-sklearn}. Comprehensive documentation and several examples are all available at \url{https://vhsven.github.io/vhsven-sklearn}.
+In the previous chapter, we found three important features that scikit-learn lacks in comparison to Weka's J48 implementation. In this chapter, we tackle the high priority pruning issue.
 
 \section{New pruning functionality}
 The most straightforward way to solve the pruning problem in scikit-learn is simply to implement an extension that provides this feature. This extension is simply a python package that can be downloaded and installed by anyone who already installed scikit-learn beforehand. We developed a new classifier called the \texttt{PruneableDecisionTreeClassifier} as the main component of such an extension. 
@@ -61,7 +57,7 @@ Error Based Pruning works similarly by setting the constructor argument \texttt{
 %pruning complexity O(...)
 
 \section{Supporting tools}
-A lack of tree pruning algorithms was not the only problem of scikit-learn when compared to Weka's J48. It also has problems with categorical attributes and missing values. The fixes for these problems had a lower priority but had to be tackled nonetheless to properly benchmark the new pruning solution. To that end, a \text{CsvImporter} class has been added to this extension that can parse arbitrary datasets. It adheres to the scikit-learn transformer interface, offering \texttt{fit}, \texttt{transform} and \texttt{fit\_transform} methods. The input is a file path to a Comma Separated Value (CSV) file, and the output is an \texttt{X, y} pair ready for consumption by tree induction algorithms\footnote{Strictly speaking, the \texttt{fit\_transform} method can only return the data \texttt{X} but not the labels \texttt{y} due to interface restrictions. Instead, \texttt{fit\_transform\_both} was introduced as a workaround.}.
+A lack of tree pruning algorithms was not the only problem of scikit-learn when compared to Weka's J48. It also has problems with categorical attributes and missing values. We will look at these problems in more detail later on. For now, some straightforward workarounds are implemented to make it possible to properly benchmark the new pruning solution. To that end, a \text{CsvImporter} class has been added to this extension that can parse arbitrary datasets. It adheres to the scikit-learn transformer interface, offering \texttt{fit}, \texttt{transform} and \texttt{fit\_transform} methods. The input is a file path to a Comma Separated Value (CSV) file, and the output is an \texttt{X, y} pair ready for consumption by tree induction algorithms\footnote{Strictly speaking, the \texttt{fit\_transform} method can only return the data \texttt{X} but not the labels \texttt{y} due to interface restrictions. Instead, \texttt{fit\_transform\_both} was introduced as a workaround.}.
 
 TODO example
 
@@ -84,3 +80,8 @@ Finally, in the rest of the data, values of categorical attributes are encoded i
 % tooling/testing/docs takes long time
 % tooling limits potential of trees (labelencoder, pipeline, gridsearchcv)
 % edge cases
+
+\section{Result}
+The resulting implementation is publicly hosted at \url{https://github.com/vhsven/vhsven-sklearn}. Comprehensive documentation and several examples are all available at \url{https://vhsven.github.io/vhsven-sklearn}. Check out the three examples concerning decision surfaces to get an intuitive feel of what the effect of each pruning method is.
+
+%TODO add images here? also of original and pruned tree

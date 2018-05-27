@@ -1,11 +1,52 @@
 \chapter{Methodology}\label{cha:method}
-Intro
+So far, relevant algorithms were covered in \autoref{cha:literature} and their implementation counterparts were discussed in \autoref{cha:software}. At that point, three capabilities were identified that made the decision tree induction implementation in scikit-learn inferior to that in Weka. For the highest priority issue (i.e., lack of pruning), the literature offered sufficient argumentation to immediately tackle this issue. The solution was presented in \autoref{cha:software_new}. At this point three tasks remain:
+\begin{itemize}
+    \item Validate whether the new pruning solutions work as expected
+    \item Verify whether the accepted workaround for categorical attributes has a significant performance impact
+    \item Find a more elegant solution to the missing values problem
+\end{itemize}
+
+At least for the first two tasks, experiments have to be performed. This chapter explains the experimental setup while \autoref{cha:results} covers the actual results.
+%TODO chapter structure
 
 % Datasets + description
 % Architecture?
 
-\section{Datasets}
-To evaluate the models created by the new '\texttt{PruneableDecisionTreeClassifier}, they are tested on a variety of classification datasets. These datasets are primarily taken from \url{www.openml.org}~\cite{openml}. The \emph{activity} dataset on the other hand belongs to a study by Kwapisz et al.~\cite{problematic_dataset}. In this study, the activity of a test subject is guessed based on sensor data from cell phone accelerometers. The possible activities are walking, jogging, going upstairs, going downstairs, sitting and standing. Scikit-learn's regular \texttt{DecisionTreeClassifier} performed poorly on this set in the past, although Weka's J48 handled it well. Table \ref{tbl:datasets} gives an overview.
+\section{Pruning implementation validation}
+First, the experimental setup of the pruning validation is discussed. The new implementations of Reduced Error Pruning and Error Based Pruning are judged on three aspects: the size of the tree, the accuracy of the tree on unseen data and the running time of the algorithm. Multiple instances of the new \texttt{PruneableDecisionTreeClassifier} take part in this experiment, each with different settings. More specifically, the following configurations are used:
+
+\begin{itemize}
+    \item no pruning and no early stopping
+    \item early stopping using $\texttt{min\_samples\_leaf} = \frac{0.5}{\texttt{n\_classes}}$ [scikit-learn exclusive]
+    \item REP with $\texttt{rep\_val\_percentage} = 10\%$
+    \item REP with $\texttt{rep\_val\_percentage} = 20\%$
+    \item REP with $\texttt{rep\_val\_percentage} = 50\%$
+    \item EBP with $\texttt{ebp\_confidence} = 10^{-5}$
+    \item EBP with $\texttt{ebp\_confidence} = 10^{-3}$
+    \item EBP with $\texttt{ebp\_confidence} = 10^{-1}$
+\end{itemize}
+
+Comparing only pruned versus unpruned trees does not tell the whole story. The pruned trees must also be compared against a sensible baseline of what scikit-learn users do if no pruning algorithm is available. That is why the early stopping configuration with \texttt{min\_samples\_leaf} is also in this list. Unfortunately, finding a good value of this parameter that works across a wide range of datasets is not easy. The current formula depends on the context to (partly) work around this issue: it takes the number of classes into account.
+
+A comparison within scikit-learn of pruned versus unpruned trees with or without early stopping criteria is a good start, but an external benchmark against similarly configured J48 instances is also interesting. Although the base algorithm of the two software libraries differ, the goal is to maintain maximum compatibility. To that end, some additional rules must be taken into account. All other parameters are set to their default values.
+
+\begin{itemize}
+    \item All algorithms must produce binary trees
+    \item Multilabel and multioutput capabilities must not be used
+    \item Nodes must be split using the information gain criterion
+    \item Early stopping criteria must not be used unless explicitly specified in the configuration
+    \item Advanced J48 features such as tree collapsing, subtree raising or MDL corrections must be disabled
+\end{itemize}
+
+For both scikit-learn and Weka, a grid search algorithm loops over all the listed configurations, fits them to a training set and finally compares the prediction made for an independent test set against the correct result. Because we start from a complete data set, it has to be split in a training set and a test set. Tenfold cross-validation takes care of this. For statistical robustness, the whole procedure is repeated ten times. Each configuration will thus be tested hundred times. Relevant statistics of each test are gathered by the built-in tools of both libraries. To have reproducible results, the seeds of the random number generators take fixed values before the experiment starts.
+
+This whole procedure assumes one dataset was given as input. To get a more complete picture of the implementation performance, the test is repeated for various datasets. These datasets are introduced below in \autoref{ssec:datasets}.
+
+Both scikit-learn and Weka offer tools to facilitate such tests and gather the statistics afterwards. Every configuration has a fairly close counterpart in the other tool. The main differences that remain after taking the above setup into account, are the different base algorithms (C4.5 versus CART), the different runtimes (Java versus Python) and the fact that the dataset in scikit-learn has to be pre-processed by the \texttt{CsvImporter} while Weka can handle the datasets out of the box.
+
+\subsection{Datasets}
+\label{ssec:datasets}
+Part of the experimental setup is the choice of datasets. We opt for a variety of real world classification datasets to get a good picture of the pruning implementation's performance. These datasets are primarily taken from \url{www.openml.org}~\cite{openml}. Table \ref{tbl:datasets} gives an overview of all datasets.
 
 \begin{table}
 \centering
@@ -28,42 +69,16 @@ To evaluate the models created by the new '\texttt{PruneableDecisionTreeClassifi
     % \href{https://www.openml.org/d/172}{shuttle} & Shuttle landing control & 2 & 6 & 15 & Yes & 6 \\
     \href{http://www.cis.fordham.edu/wisdm/dataset.php}{activity} & Activity prediction & 6 & 45 & 5 424 & Yes & 0 \\
 \end{tabular}
-\caption{Overview of classification datasets. Column C indicates the number of classes, F the number of features (excluding the class feature), N the number of observations, M whether the datasets contains missing values and CF the number of categorical features (also excluding class).}%
+\caption{Overview of real world classification datasets. Column C indicates the number of classes, F the number of features (excluding the class feature), N the number of observations, M whether the datasets contains missing values and CF the number of categorical features (also excluding class).}%
 \label{tbl:datasets}
 \end{table}
 
+The \emph{activity} dataset is the odd one out. It belongs to a study by Kwapisz et al.~\cite{problematic_dataset}. In this study, the activity of a test subject is predicted based on sensor data from cell phone accelerometers. The possible activities are walking, jogging, going upstairs, going downstairs, sitting and standing. Scikit-learn's regular \texttt{DecisionTreeClassifier} performed poorly on this set in the past, although Weka's J48 handled it well.
+
+\section{Evaluate need for categorical attributes}
+
+
 \section{Evaluation}
-%grid search:
-% param_grid = [
-%     {
-%         "prune": [None]
-%     },
-%     {
-%         "prune": [None],
-%         "min_samples_leaf": [0.5 / n_classes]
-%     },
-%     {
-%         "prune": ['rep'],
-%         "rep_test_percentage": [1/10, 1/5, 1/3, 1/2]
-%     },
-%     {
-%         "prune": ['ebp'],
-%         "ebp_confidence": [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1/20, 1/2]
-%     }
-% ]
-%RepeatedStratifiedKFold K=10 R=10, dataset first
-%per tool per dataset, per prune method (+hyperparameters):
-%n_nodes, n_leaves, accuracy, f1_weighted, fit_time, score_time (mean/std)
-%random_state / seed
+
 
 \section{Conclusion}
-
-% scikit: no categorical input
-%   cannot be fixed (based on numpy) without complete rewrite
-% also: scikit = binary trees
-%   cannot be fixed without complete rewrite (and Breiman says it's OK)
-%   TODO verify in Weka whether it would make a difference
-% current workaround: one-hot encoding
-%   isomorphic to binary trees Weka would generate (except = instead of <)
-%   both performance on hardware level is same
-%   TODO verify hypothesis in Weka with and without encoding (all binary)
