@@ -39,6 +39,7 @@ A comparison within scikit-learn of pruned versus unpruned trees with or without
 \end{itemize}
 
 For both scikit-learn and Weka, a grid search algorithm loops over all the listed configurations, fits them to a training set and finally compares the prediction made for an independent test set against the correct result. Because we start from a complete data set, it has to be split in a training set and a test set. Tenfold cross-validation takes care of this. For statistical robustness, the whole procedure is repeated ten times. Each configuration will thus be tested hundred times. Relevant statistics of each test are gathered by the built-in tools of both libraries. To have reproducible results, the seeds of the random number generators take fixed values before the experiment starts.
+%TODO stratified?
 
 This whole procedure assumes one dataset was given as input. To get a more complete picture of the implementation performance, the test is repeated for various datasets. These datasets are introduced below in \autoref{ssec:datasets}.
 
@@ -62,8 +63,8 @@ Part of the experimental setup is the choice of datasets. We opt for a variety o
     \href{https://www.openml.org/d/53}{heart} & Heart disease & 2 & 13 & 270 & No & 0 \\
     \href{https://www.openml.org/d/334}{monks} & Monks problems & 2 & 6 & 601 & No & 6 \\
     \href{https://www.openml.org/d/50}{tic-tac-toe} & Tic-tac-toe endgame & 2 & 9 & 958 & No & 9 \\
-    \href{https://www.openml.org/d/31}{credit-g} & Credit risk & 2 & 20 & 1 000 & No & 13 \\
-    \href{https://www.openml.org/d/10}{lymph} & Lymphography & 4 & 18 & 148 & No & 15 \\
+    \href{https://www.openml.org/d/31}{credit-g} & German credit risk & 2 & 20 & 1 000 & No & 13 \\
+    % \href{https://www.openml.org/d/10}{lymph} & Lymphography & 4 & 18 & 148 & No & 15 \\
     \href{https://www.openml.org/d/56}{vote} & 1984 US votes & 2 & 16 & 435 & Yes & 16 \\
     \href{https://www.openml.org/d/55}{hepatitis} & Hepatitis survival & 2 & 19 & 155 & Yes & 13 \\
     % \href{https://www.openml.org/d/172}{shuttle} & Shuttle landing control & 2 & 6 & 15 & Yes & 6 \\
@@ -76,7 +77,19 @@ Part of the experimental setup is the choice of datasets. We opt for a variety o
 The \emph{activity} dataset is the odd one out. It belongs to a study by Kwapisz et al.~\cite{problematic_dataset}. In this study, the activity of a test subject is predicted based on sensor data from cell phone accelerometers. The possible activities are walking, jogging, going upstairs, going downstairs, sitting and standing. Scikit-learn's regular \texttt{DecisionTreeClassifier} performed poorly on this set in the past, although Weka's J48 handled it well.
 
 \section{Evaluate need for categorical attributes}
+% Weka: binary vs non binary - significant differences
+%   binary -> non-binary
+%   tic-tac-toe: 
+%       41.36 -> 10 nodes
+%       21.18 -> 7 leaves
+%       92.79 -> 68.96 accuracy
+%       0.93 -> 0.71 F1
+%   monks: always tree with only root node, no F1 score
+%   activity: 85.66 -> 84.43 accuracy (no significant difference in F1)
+% ==> non-binary same or disadvantage
 
+% Weka: NominalToBinary -A filter
+% TODO compare with/without one-hot encoding
 
 \section{Evaluation}
 
