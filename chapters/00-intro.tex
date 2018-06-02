@@ -5,7 +5,7 @@ Decision tree induction is one of the most well-known tools in the machine learn
 
 Contemporary AI researchers focus a lot of their attention on neural networks and in particular deep learning --- the recent hype around DeepMind's AlphaGo~\cite{alphago} victories comes to mind. Nevertheless, a quick Google Scholar search will reveal that decision tree research is not dead. Researchers still continue to propose new or improved algorithms and analyses.
 
-Theory is one thing, but the algorithms need to be implemented as computer programs to actually be useful. Scikit-learn~\cite{scikit-learn} is a very popular machine learning library written in Python. As such, it also contains implementations of various decision tree induction algorithms. Before scikit-learn became popular, a Java-based library called Weka~\cite{eibe2016weka} (or ``Waikato Environment for Knowledge Analysis'' in full) was often used instead. The implementations of decision tree algorithms in Weka are to this day still in many respects superior to those in scikit-learn. Other libraries that implement similar algorithms exist (e.g., Apache Spark~\cite{spark}), but those are beyond the scope of this text.
+Theory is one thing, but the algorithms need to be implemented as computer programs to actually be useful. Scikit-learn~\cite{scikit-learn} is a very popular machine learning library written in Python. As such, it also contains implementations of various decision tree induction algorithms. Before scikit-learn became popular, a Java-based library called Weka~\cite{eibe2016weka} (or ``Waikato Environment for Knowledge Analysis'' in full) was often used instead. The implementations of decision tree algorithms in Weka are to this day still in many respects superior to those in scikit-learn. Other tools that implement similar algorithms exist (e.g., Apache Spark~\cite{spark}), but those are beyond the scope of this text.
 
 \section{Goal}
 The goal of this thesis is to alleviate the discrepancies between scikit-learn and Weka concerning decision tree induction. Mind that decision tree induction tools can never be truly ``complete'' as stated in the title because the field is immensely broad and still continues to grow. Nevertheless, an effort can be made to improve feature parity between these two popular tools.
@@ -24,13 +24,13 @@ Some would perhaps question the relevance of such ``outdated'' techniques anno 2
     \item Handles both categorical and numerical data
     \item Handles missing data elegantly %TODO missing values fix?
     \item Handles multiclass, multilabel and multioutput problems natively
-    \item Fast training
-    \item Fast inference
+    \item Short fitting duration
+    \item Short prediction duration
 \end{enumerate}
 
 Of course decision tree induction algorithms are not perfect:
 \begin{enumerate}
-    \item Unstable: small modifications in training data can result in a completely different tree
+    \item Unstable: small modifications in training set can result in a completely different tree
     \item Learning optimal trees is an NP-Complete problem~\cite{npcomplete}, so heuristics are used to find approximations
     \item Prone to overfitting if not actively countered by adding early stopping criteria or an extra pruning step
     \item Prone to bias when one class appears more much frequently in the training set than others.

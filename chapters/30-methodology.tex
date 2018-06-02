@@ -1,31 +1,30 @@
 \chapter{Methodology}\label{cha:method}
 So far, relevant algorithms were covered in \autoref{cha:literature} and their implementation counterparts were discussed in \autoref{cha:software}. At that point, three capabilities were identified that made the decision tree induction implementation in scikit-learn inferior to that in Weka. For the highest priority issue (i.e., lack of pruning), the literature offered sufficient argumentation to immediately tackle this issue. The solution was presented in \autoref{cha:software_new}. At this point three tasks remain:
 \begin{itemize}
-    \item Validate whether the new pruning solutions work as expected
+    \item Validate whether the new pruning implementations work as expected
     \item Verify whether the accepted workaround for categorical attributes has a significant performance impact
     \item Find a more elegant solution to the missing values problem
 \end{itemize}
 
-At least for the first two tasks, experiments have to be performed. This chapter explains the experimental setup while \autoref{cha:results} covers the actual results.
-%TODO chapter structure
+At least for the first two tasks, experiments have to be performed. This chapter explains the experimental setup while \autoref{cha:results} covers the actual results. In the first section, the pruning validation methodology is covered. The next section discusses the categorical attribute experiment.
 
 \section{Pruning implementation validation}
-First, the experimental setup of the pruning validation is discussed. The new implementations of Reduced Error Pruning and Error Based Pruning are judged on three aspects: the size of the tree, the accuracy of the tree on unseen data and the running time of the algorithm. Multiple instances of the new \texttt{PruneableDecisionTreeClassifier} take part in this experiment, each with different settings. More specifically, the following configurations are used:
+First, the experimental setup of the pruning validation is discussed. The experiment involves both the new \texttt{PruneableDecisionTreeClassifier} and Weka's J48 classifier. The original \texttt{DecisionTreeClassifier} is not included because the pruneable version can be configured to behave exactly the same. The following configurations are used, showing the specific scikit-learn and Weka parameters:
 
 \begin{itemize}
     \item no pruning and no early stopping
     \item early stopping using $\texttt{min\_samples\_leaf} = \frac{0.5}{\texttt{n\_classes}}$ [scikit-learn exclusive]
-    \item REP with $\texttt{rep\_val\_percentage} = 10\%$
-    \item REP with $\texttt{rep\_val\_percentage} = 20\%$
-    \item REP with $\texttt{rep\_val\_percentage} = 50\%$
-    \item EBP with $\texttt{ebp\_confidence} = 10^{-5}$
-    \item EBP with $\texttt{ebp\_confidence} = 10^{-3}$
-    \item EBP with $\texttt{ebp\_confidence} = 10^{-1}$
+    \item REP with $\texttt{rep\_val\_percentage} = 10\%$ or $\texttt{numFolds} = 10$
+    \item REP with $\texttt{rep\_val\_percentage} = 20\%$ or $\texttt{numFolds} = 5$
+    \item REP with $\texttt{rep\_val\_percentage} = 50\%$ or $\texttt{numFolds} = 2$
+    \item EBP with $\texttt{ebp\_confidence} = \texttt{confidenceFactor} = 10^{-5}$
+    \item EBP with $\texttt{ebp\_confidence} = \texttt{confidenceFactor} = 10^{-3}$
+    \item EBP with $\texttt{ebp\_confidence} = \texttt{confidenceFactor} = 10^{-1}$
 \end{itemize}
 
-Comparing only pruned versus unpruned trees does not tell the whole story. The pruned trees must also be compared against a sensible baseline of what scikit-learn users do if no pruning algorithm is available. That is why the early stopping configuration with \texttt{min\_samples\_leaf} is also in this list. Unfortunately, finding a good value of this parameter that works across a wide range of datasets is not easy. The current formula depends on the context to (partly) work around this issue: it takes the number of classes into account.
+Comparing only pruned versus unpruned trees does not tell the whole story. The pruned trees must also be compared against a sensible baseline of what scikit-learn users do if no pruning algorithm is available. That is why the early stopping configuration with \texttt{min\_samples\_leaf} is also in this list. Unfortunately, finding a good value of this parameter that works across a wide range of datasets is not easy. The current formula depends on the context to (partly) work around this issue: it takes the number of classes into account. Note that for this specific early stopping configuration a mirror configuration in Weka is absent.
 
-A comparison within scikit-learn of pruned versus unpruned trees with or without early stopping criteria is a good start, but an external benchmark against similarly configured J48 instances is also interesting. Although the base algorithm of the two software libraries differ, the goal is to maintain maximum compatibility in experimental setup. To that end, some additional rules must be taken into account. All other parameters are set to their default values.
+A comparison within scikit-learn of pruned versus unpruned trees with or without early stopping criteria is a good start, but an external benchmark against similarly configured J48 instances is also interesting. Although the base algorithms of the two software libraries differ, the goal is to maintain maximum compatibility in the experimental setup. To that end, some additional rules must be taken into account.
 
 \begin{itemize}
     \item All algorithms must produce binary trees
@@ -35,12 +34,15 @@ A comparison within scikit-learn of pruned versus unpruned trees with or without
     \item Advanced J48 features such as tree collapsing, subtree raising or MDL corrections must be disabled
 \end{itemize}
 
-For both scikit-learn and Weka, a grid search algorithm loops over all the listed configurations, fits them to a training set and finally compares the prediction made for an independent test set against the correct result. Because we start from a complete data set, it has to be split in a training set and a test set. Tenfold cross-validation takes care of this. For statistical robustness, the whole procedure is repeated ten times. Each configuration will thus be tested one hundred times. Relevant statistics of each test are gathered by the built-in tools of both libraries. To have reproducible results, the seeds of the random number generators take fixed values before the experiment starts. Furthermore, the whole process is scripted and can be done in one run each for scikit-learn and Weka. All tests are performed on a single computer that is otherwise idle (except for system processes). This ensures that the environment changes as little as possible and that the test results can be compared in a fair way.
-%TODO stratified?
+All other parameters are set to their default values.
 
-This whole procedure assumes one dataset was given as input. To get a more complete picture of the implementation performance, the test is repeated for various datasets. These datasets are introduced below in \autoref{ssec:datasets}.
+For both scikit-learn and Weka, a grid search algorithm loops over all the listed configurations, fits them to a training set and finally compares the prediction made for an independent test set against the correct result. Because we start from a complete data set, it has to be split in a training set and a test set. Tenfold stratified cross-validation takes care of this. For statistical robustness, the whole procedure is repeated ten times. Each configuration will thus be tested one hundred times. Relevant statistics of each test are gathered by the built-in features of both tools. To have reproducible results, the seeds of the random number generators take fixed values before the experiment starts. Furthermore, the whole process is scripted and can be done in one run each for scikit-learn and Weka. All tests are performed on a single computer that is otherwise idle (except for system processes). This ensures that the external environment changes as little as possible and that the test results can be compared in a fair way.
 
-Both scikit-learn and Weka offer tools to facilitate such tests and gather the statistics afterwards. Every configuration has a fairly close counterpart in the other tool. The main differences that remain after taking the above setup into account, are the different base algorithms (C4.5 versus CART), the different runtimes (Java versus Python) and the fact that the dataset in scikit-learn has to be pre-processed by the \texttt{CsvImporter} while Weka can handle the datasets out of the box.
+This whole procedure assumes one dataset was given as input. To get a more complete picture of the implementation performance, the test is repeated for various datasets. \autoref{ssec:datasets} introduces all datasets used in this thesis. The aforementioned \texttt{CsvImporter}~(\autoref{sec:csvimporter}) pre-processes each dataset when a scikit-learn classifier is used. Weka does not require pre-processing, but all missing values are discarded nonetheless to effectuate an unbiased comparison.
+
+Both scikit-learn and Weka offer tools to facilitate such tests and gather the statistics afterwards. Every configuration has a fairly close counterpart in the other tool. The main differences that remain after taking the above setup into account, are the different base algorithms (C4.5 versus CART) and the different runtimes (Java versus Python).
+
+The new implementations of Reduced Error Pruning and Error Based Pruning are judged on three aspects: the accuracy on unseen data and the fitting \& prediction time of the algorithm. The size of the tree and the number of leaves are also saved to get more insight into any potential differences.
 
 \subsection{Datasets}
 \label{ssec:datasets}
@@ -49,7 +51,7 @@ Part of the experimental setup is the choice of datasets. We opt for a variety o
 \begin{table}
 \centering
 \begin{tabular}[htp]{ l l r r r l r }
-    Name & Description & C & F & N & M & CF \\ \hline
+    Name & Description & C & A & N & M & CA \\ \hline
     \href{https://www.openml.org/d/37}{diabetes} & Pima Indians diabetes & 2 & 8 & 768 & No & 0 \\
     \href{https://www.openml.org/d/59}{ionosphere} & Johns Hopkins ionosphere & 2 & 34 & 351 & No & 0 \\
     \href{https://www.openml.org/d/61}{iris} & Fisher's iris & 3 & 4 & 150 & No & 0 \\
@@ -67,18 +69,22 @@ Part of the experimental setup is the choice of datasets. We opt for a variety o
     % \href{https://www.openml.org/d/172}{shuttle} & Shuttle landing control & 2 & 6 & 15 & Yes & 6 \\
     \href{http://www.cis.fordham.edu/wisdm/dataset.php}{activity} & Activity prediction & 6 & 45 & 5 424 & Yes & 0 \\
 \end{tabular}
-\caption{Overview of real world classification datasets. Column C indicates the number of classes, F the number of features (excluding the class feature), N the number of observations, M whether the datasets contains missing values and CF the number of categorical features (also excluding class).}%
+\caption{Overview of real world classification datasets. Column C indicates the number of classes, A the number of attributes (excluding the class attribute), N the number of observations, M whether the datasets contains missing values and CA the number of categorical attributes (also excluding class).}%
 \label{tbl:datasets}
 \end{table}
 
+These specific datasets were selected for their popularity in the machine learning community much more than for their specific contents. Nevertheless, care was taken to have a healthy mix of datasets with some variation in the number of instances, the number of classes, the number of (categorical) attributes and the amount of missing data.
+
 The \emph{activity} dataset is the odd one out. It belongs to a study by Kwapisz et al.~\cite{problematic_dataset}. In this study, the activity of a test subject is predicted based on sensor data from cell phone accelerometers. The possible activities are walking, jogging, going upstairs, going downstairs, sitting and standing. Scikit-learn's regular \texttt{DecisionTreeClassifier} performed poorly on this set in the past, although Weka's J48 handled it well.
 
-\section{Evaluate need for categorical attributes}
-One of the conclusions in \autoref{cha:software} was that scikit-learn does not support categorical attributes out of the box. The proposed workaround consists of encoding all categorical attributes in a dataset using a one-hot scheme during the pre-processing stage. We hypothesized that this step would not negatively affect the performance of the resulting decision tree classifier. Unfortunately this hypothesis cannot be tested directly in scikit-learn, so Weka is used as a surrogate instead. The J48 can be configured in a way that strongly mimics the behaviour of CART, for example by generating only binary trees and disabling advanced features. If the hypothesis holds for J48 in this configuration, it is reasonable to assume that it would also hold for scikit-learn's decision tree classifier and consequently that there is no need to reimplement that algorithm.
+\section{Evaluate the need for categorical attribute support}
+One of the conclusions in \autoref{cha:software} was that scikit-learn does not support categorical attributes out of the box. The proposed workaround consists of encoding all categorical attributes in a dataset using a one-hot scheme during the pre-processing stage. We hypothesized that this step would not negatively affect the performance of the resulting decision tree classifier. Unfortunately this hypothesis cannot be tested directly in scikit-learn, so Weka is used as a surrogate instead. The J48 can be configured in a way that strongly mimics the behaviour of CART, for example by generating only binary trees and disabling advanced features. If the hypothesis holds for J48 in this configuration, it is reasonable to assume that it would also hold for scikit-learn's decision tree classifier and consequently that there is no need to extend the latter's implementation.
 
-The methodology is exactly the same as the one described in the previous section, except that other classifier configurations are involved. More specifically, there are only two classifiers. One is the regular Weka J48 classifier with Error Based Pruning enabled and a fixed confidence value. The other is a metaclassifier called a \texttt{FilteredClassifier} that combines the supervised \texttt{NominalToBinary} attribute filter with another J48 instance configured exactly the same as the first. The filter applies a one-hot encoding on all categorical attributes.
+The methodology is exactly the same as the one described in the previous section, except that missing values are retained and that other classifier configurations are involved. More specifically, there are only two classifiers. One is the regular Weka J48 classifier with Error Based Pruning enabled and a fixed confidence value. The other is a metaclassifier called a \texttt{FilteredClassifier} that combines the supervised \texttt{NominalToBinary} attribute filter with another J48 instance configured exactly the same as the first. The filter applies a one-hot encoding on all categorical attributes.
 
-The main question is whether there is a significant difference in accuracy, training or prediction time between these two classifiers. The built-in Weka analysis tools are used to determine this. More specifically, a statistical test called a (corrected) paired t-test is used using confidence parameter $\alpha = 0.05$. Its null hypothesis $H_0$ states that the mean difference between two sets of observations equals zero. The reason the test statistic is corrected is to compensate for the bias introduced by the repeated cross-validation procedure~\cite{statcomparison-learning}. Furthermore, this test makes some assumptions about the data, for example that it is distributed sufficiently Gaussian-like. A simple QQ-plot indicates that this is a reasonable assumption in our case. More advanced comparison techniques such as nonparametric comparison tests based on rankings are known~\cite{statcomparison}, but are not readily available for us to use.
+The built-in Weka analysis tool determines whether there is a significant difference in accuracy, fitting or prediction time between these two classifiers at confidence level $\alpha = 0.05$. This tool uses a statistical test called a (corrected) paired t-test. Its null hypothesis $H_0$ states that the mean difference between two sets of observations equals zero. The reason the test statistic is corrected is to compensate for the bias introduced by the repeated cross-validation procedure~\cite{statcomparison-learning}. Furthermore this test makes some assumptions about the data, for example that it is distributed sufficiently Gaussian-like. A histogram and a QQ-plot indicate that this is a reasonable assumption in our case. More advanced comparison techniques such as nonparametric comparison tests based on rankings are known~\cite{statcomparison}, but are not readily available for us to use.
+
+As a bonus, the same methodology is used to determine whether non-binary trees perform better than binary trees. To accomplish this the metaclassifier configuration is switched out for a copy of the first J48 configuration but with the binary-only option disabled.
 
 % Weka: binary vs non binary - significant differences
 %   binary -> non-binary
@@ -91,10 +97,12 @@ The main question is whether there is a significant difference in accuracy, trai
 %   activity: 85.66 -> 84.43 accuracy (no significant difference in F1)
 % ==> non-binary same or disadvantage
 
-% Weka: NominalToBinary -A filter
-% TODO compare with/without one-hot encoding
-
-\section{Evaluation}
-
-
 \section{Conclusion}
+In this chapter we discussed the experimental setup for three experiments:
+\begin{itemize}
+    \item Validate whether the new pruning implementations work as expected
+    \item Verify whether the accepted workaround for categorical attributes has a significant performance impact
+    \item Verify whether binary trees perform significantly different from non-binary trees.
+\end{itemize}
+
+The results of these experiments are shown and discussed in \autoref{cha:results}.

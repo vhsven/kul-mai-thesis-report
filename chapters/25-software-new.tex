@@ -21,7 +21,7 @@ These requirements facilitate migrations to the new pruning-enabled decision tre
 
 From a software engineering perspective, meeting these requirements can be accomplished in two ways. Either make \texttt{PruneableDecisionTreeClassifier} inherit from \texttt{DecisionTreeClassifier} or implement the former using a decorator pattern. The result is the same, but the second option would require more boilerplate code. As such, the first option (inheritance) was chosen. The class diagram is shown in figure \ref{fig:classifier_classes}.
 
-Adding pruning to an existing algorithm exclusively involves adding another step to the training process. In scikit-learn terms, this only requires an override of the \texttt{fit} method, while the other methods keep their existing implementation.
+Adding pruning to an existing algorithm exclusively involves adding another step to the fitting process. In scikit-learn terms, this only requires an override of the \texttt{fit} method, while the other methods keep their existing implementation.
 
 \begin{figure}[htp]
     \centering
@@ -45,10 +45,10 @@ Implementation-wise, the pruning logic has been isolated from the other tree log
 \subsubsection{Reduced Error Pruning}
 Reduced Error Pruning is enabled by setting the constructor argument \texttt{prune='rep'}. It requires a separate validation set. There are two ways to deal with this problem. One, introduce two additional parameters to the fit method where the user can supply his own validation data (\texttt{X\_val}) and labels (\texttt{y\_val}). This maximizes the flexibility. However, it also places the burden of separating the original training set on the user. Worse, it breaks the classifier interface. Option two instead takes care of the separation internally using a stratified \texttt{test\_train\_split}. The user only has to provide the training set as usual, and also indicate which percentage of that set must be reserved for pruning via the \texttt{rep\_val\_percentage} argument. Because interface consistency is part of the functional requirements, option two was chosen. Weka's J48 contains a similar solution when this pruning strategy is used.
 
-Once the two sets are separated, training can begin with the reduced training set using the existing implementation (i.e., the \texttt{fit} method of the base class). Afterwards, the \texttt{prune} method of a \texttt{ReducerErrorPruner} instance is called to simplify the tree.
+Once the two sets are separated, fitting can begin with the reduced training set using the existing implementation (i.e., the \texttt{fit} method of the base class). Afterwards, the \texttt{prune} method of a \texttt{ReducerErrorPruner} instance is called to simplify the tree.
 
 \subsubsection{Error Based Pruning}
-Error Based Pruning works similarly by setting the constructor argument \texttt{prune='ebp'}, but it does not require a validation set. Consequently, the training set provided by the user can be passed directly to the original \texttt{fit} method of the \texttt{DecisionTreeClassifier} base instance. Next, an instance of \texttt{ErrorBasedPruner} is created and its \texttt{prune} method is called with a confidence value that the user provided in the constructor of the new \texttt{PruneableDecisionTreeClassifier}. This confidence value is needed to calculate a statistical upper bound to the errors observed during training.
+Error Based Pruning works similarly by setting the constructor argument \texttt{prune='ebp'}, but it does not require a validation set. Consequently, the training set provided by the user can be passed directly to the original \texttt{fit} method of the \texttt{DecisionTreeClassifier} base instance. Next, an instance of \texttt{ErrorBasedPruner} is created and its \texttt{prune} method is called with a confidence value that the user provided in the constructor of the new \texttt{PruneableDecisionTreeClassifier}. This confidence value is needed to calculate a statistical upper bound to the observed errors.
 
 %performance: avoid for loops, maximize np calls
 % -> cython not needed
@@ -57,6 +57,7 @@ Error Based Pruning works similarly by setting the constructor argument \texttt{
 %pruning complexity O(...)
 
 \section{Supporting tools}
+\label{sec:csvimporter}
 A lack of tree pruning algorithms was not the only problem of scikit-learn when compared to Weka's J48. It also has problems with categorical attributes and missing values. We will look at these problems in more detail later on. For now, some straightforward workarounds are implemented to make it possible to properly benchmark the new pruning solution. To that end, a \text{CsvImporter} class has been added to this extension that can parse arbitrary datasets. It adheres to the scikit-learn transformer interface, offering \texttt{fit}, \texttt{transform} and \texttt{fit\_transform} methods. The input is a file path to a Comma Separated Value (CSV) file, and the output is an \texttt{X, y} pair ready for consumption by tree induction algorithms\footnote{Strictly speaking, the \texttt{fit\_transform} method can only return the data \texttt{X} but not the labels \texttt{y} due to interface restrictions. Instead, \texttt{fit\_transform\_both} was introduced as a workaround.}.
 
 TODO example
