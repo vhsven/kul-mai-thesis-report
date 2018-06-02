@@ -22,7 +22,7 @@ Some would perhaps question the relevance of such ``outdated'' techniques anno 2
     \item Non-parametric: makes very few assumptions about data
     \item No data normalization required
     \item Handles both categorical and numerical data
-    \item Handles missing data elegantly %TODO missing values fix?
+    \item Handles missing data elegantly
     \item Handles multiclass, multilabel and multioutput problems natively
     \item Short fitting duration
     \item Short prediction duration
@@ -39,5 +39,4 @@ Of course decision tree induction algorithms are not perfect:
 Some of these drawbacks can be overcome by using an ensemble of decision trees, but that in turn negatively impacts some of the advantages.
 
 \section{Thesis structure}
-The structure of the remainder of this text is as follows. First, an overview of the literature study concerning decision tree induction will be presented and the scope of the thesis will be determined. Next, the decision tree implementations in Weka and scikit-learn are compared to their underlying algorithms and to each other. This results in a list of capabilities. Based on these differences in capabilities, we formulate some hypotheses that can explain the differences in performance. Chapter~\ref{cha:method} discusses experimental setups. It is followed by chapter~\ref{cha:results} which presents and discusses the results of these experiments. We conclude with chapter~\ref{cha:conclusion}.
-%TODO improve structure
+The structure of the remainder of this text is as follows. First, an overview of the literature study concerning decision tree induction will be presented and the scope of the thesis will be determined in \autoref{cha:literature}. Next, in \autoref{cha:software} the decision tree implementations in Weka and scikit-learn are compared to their underlying algorithms and to each other. This results in a list of capabilities. Based on these differences in capabilities, we formulate some hypotheses that can explain the differences in performance. One obvious problem --- a missing capability of scikit-learn that does not require additional verification --- is attended to in \autoref{cha:software_new}. Chapter~\ref{cha:method} details experiments used to verify whether other discrepancies in capabilities also have a performance impact. It is followed by \autoref{cha:results} which presents and discusses the results of these experiments. Additionally, the work done in \autoref{cha:software_new} is validated. We conclude with \autoref{cha:conclusion}.

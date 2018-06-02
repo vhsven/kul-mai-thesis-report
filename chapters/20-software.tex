@@ -46,17 +46,12 @@ In conclusion, the suggested workaround with the one-hot encoder is acceptable b
 \subsubsection{Missing values}
 Another important input capability is dealing with missing values. As stated before, decision trees have fairly straightforward ways of dealing with this problem. While the papers on ID3 ignored this issue, both C4.5 and CART have methods for dealing with it. As before, Weka inherited the capability from C4.5, but scikit-learn did not inherit the same from CART. This is another case where extra pre-processing is needed to make decision tree induction work with scikit-learn. During this process, valuable observations might be thrown out entirely.
 
-%TODO observation weights to split observations with missing values
-
 \subsection{Output capabilities}
 \subsubsection{Classification and regression}
 For this thesis regression is out of scope, but it is still an important point. CART has both classification and regression in its name, so it comes as no surprise that both are supported by this algorithm. The scikit-learn implementation is split in a \texttt{DecisionTreeClassifier} and a \texttt{DecisionTreeRegressor}. C4.5 only supports classification out of the box. Consequently, regression is not a capability of Weka's J48 implementation. However, Weka contains other decision tree algorithms, some of which do accommodate regression (e.g., \texttt{REPTree}).
 
 \subsubsection{Multiclass, multilabel, multioutput}
-On this front, scikit-learn is the superior implementation because all variants of multiclass, multilabel and multioutput are supported. Weka's implementation on the other hand only supports multiclass. A simple workaround for multioutput is to fit multiple trees instead, although this might impact various performance aspects.
-%TODO CART, C4.5?
-
-%TODO model trees? ~ regression
+On this front, scikit-learn is the superior implementation because all variants of multiclass, multilabel and multioutput are supported. Weka's J48 implementation on the other hand only supports multiclass. CART and C4.5 have the same limitations as Weka's. A simple workaround for multioutput is to fit multiple trees instead, although this might impact various performance aspects.
 
 \subsection{Splitting criteria}
 Another difference lies in the choice of splitting criteria. C4.5 and J48 support the typical criteria based on information theory such as information gain and gain ratio. CART and scikit-learn on the other hand both support information gain and the Gini impurity index but not gain ratio since it is not beneficial for binary trees. The purity criterion is not implemented in any of the algorithms due to its poor performance.
@@ -72,6 +67,7 @@ Many more capabilities exist, but these are beyond the scope of this thesis. The
 \begin{itemize}
     \item Generating rulesets starting for a tree representation
     \item Assigning different weights to different classes
+    \item Assigning different weights to different observations
     \item Taking asymmetric misclassification costs into account
 \end{itemize}
 
@@ -113,16 +109,10 @@ In conclusion, the currently accepted workaround of pre-processing the categoric
 % current workaround: one-hot encoding
 %   isomorphic to binary trees Weka would generate
 %     except = instead of <, but performance on hardware level is same
-%   TODO verify hypothesis in Weka with and without encoding (all binary)
 
 \subsection{Missing value handling}
-The third and lowest priority problem is the failure of scikit-learn to process datasets containing missing values. Three approaches are possible. The first workaround discards any observation with missing values. Depending on the context, this data loss is somewhere between irrelevant and unacceptable. The second workaround attempts to guess the values for the gaps in the data based on the rest of the data. The user must judge whether this approach is feasible in his context, but it certainly is no universal solution. For that, we look at the third option. Unlike the previous workarounds, this is not a pre-processing step. Instead, the classifier itself must be modified to deal with missing data directly. Decision tree induction algorithms typically have that capability. C4.5 and CART both have it (in theory). This could for example work by splitting an observation with a missing value into as many fake observations as there are possible values for the missing (categorical) attribute where each distinct value is used once. Some lower internal weight could be assigned to these fake observations to compensate for the data expansion.
+The third and lowest priority problem is the failure of scikit-learn to process datasets containing missing values. Three approaches are possible. The first workaround discards any observation with missing values. Depending on the context, this data loss is somewhere between irrelevant and unacceptable. The second workaround attempts to guess the values for the gaps in the data based on the rest of the data. The user must judge whether this approach is feasible in his context, but it certainly is no universal solution. For that, we look at the third option. Unlike the previous workarounds, this is not a pre-processing step. Instead, the classifier itself must be modified to deal with missing data directly. Decision tree induction algorithms typically have that capability. The C4.5 and CART texts both outline ways to deal with this problem. One option is to split an observation with a missing value into as many fake observations as there are possible values for the missing (categorical) attribute where each distinct value is used once. Some lower internal weight could be assigned to these fake observations to compensate for the data expansion.
 %TODO next steps missing values?
-
-%TODO move/delete?
-% \section{Software engineering perspective}
-% From a practical point of view, the most obvious difference is that the former is written in Java and the latter in Python. This has implications that go beyond mere syntax. Weka is written in a traditional object-orient style of software engineering, while scikit-learn uses a more procedural style with some intermittent object oriented aspects spaced throughout the code. This choice of the scikit-learn developers was motivated by performance reasons, but on the other hand this makes the code harder to understand, maintain and extend. This effect is amplified by the fact that the code is not always pure Python; it also contains some Cython and C code.
-%TODO this is perhaps why scikit-learn is lacking in this area
 
 \section{Conclusion}
 This chapter introduced us to the various capabilities of decision trees. Those capabilities were mapped onto both the CART and C4.5 algorithms, but also the Weka J48 and scikit-learn implementations. This exercise revealed three important discrepancies that make scikit-learn inferior to Weka regarding decision tree induction. Those discrepancies concern pruning, categorical values and missing values. For each of these, next steps have been defined. The next chapter immediately tackles the pruning problem head-on.

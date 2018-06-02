@@ -36,7 +36,7 @@ A comparison within scikit-learn of pruned versus unpruned trees with or without
 
 All other parameters are set to their default values.
 
-For both scikit-learn and Weka, a grid search algorithm loops over all the listed configurations, fits them to a training set and finally compares the prediction made for an independent test set against the correct result. Because we start from a complete data set, it has to be split in a training set and a test set. Tenfold stratified cross-validation takes care of this. For statistical robustness, the whole procedure is repeated ten times. Each configuration will thus be tested one hundred times. Relevant statistics of each test are gathered by the built-in features of both tools. To have reproducible results, the seeds of the random number generators take fixed values before the experiment starts. Furthermore, the whole process is scripted and can be done in one run each for scikit-learn and Weka. All tests are performed on a single computer that is otherwise idle (except for system processes). This ensures that the external environment changes as little as possible and that the test results can be compared in a fair way.
+For both scikit-learn and Weka, a grid search algorithm loops over all the listed configurations, fits them to a training set and finally compares the prediction made for an independent test set against the correct result. Because we start from a complete data set, it has to be split in a training set and a test set. Tenfold stratified cross-validation takes care of this. For statistical robustness, the whole procedure is repeated ten times. Each configuration will thus be tested one hundred times. Relevant statistics of each test are gathered by the built-in features of both tools. To have reproducible results, the seeds of the random number generators take fixed values before the experiment starts. Furthermore, the whole process is scripted and can be done in one run each for scikit-learn and Weka. A single thread is used to avoid the complexities of multithreading. All tests are performed on a single computer that is otherwise idle (except for system processes). This ensures that the external environment changes as little as possible and that the test results can be compared in a fair way.
 
 This whole procedure assumes one dataset was given as input. To get a more complete picture of the implementation performance, the test is repeated for various datasets. \autoref{ssec:datasets} introduces all datasets used in this thesis. The aforementioned \texttt{CsvImporter}~(\autoref{sec:csvimporter}) pre-processes each dataset when a scikit-learn classifier is used. Weka does not require pre-processing, but all missing values are discarded nonetheless to effectuate an unbiased comparison.
 
@@ -85,17 +85,6 @@ The methodology is exactly the same as the one described in the previous section
 The built-in Weka analysis tool determines whether there is a significant difference in accuracy, fitting or prediction time between these two classifiers at confidence level $\alpha = 0.05$. This tool uses a statistical test called a (corrected) paired t-test. Its null hypothesis $H_0$ states that the mean difference between two sets of observations equals zero. The reason the test statistic is corrected is to compensate for the bias introduced by the repeated cross-validation procedure~\cite{statcomparison-learning}. Furthermore this test makes some assumptions about the data, for example that it is distributed sufficiently Gaussian-like. A histogram and a QQ-plot indicate that this is a reasonable assumption in our case. More advanced comparison techniques such as nonparametric comparison tests based on rankings are known~\cite{statcomparison}, but are not readily available for us to use.
 
 As a bonus, the same methodology is used to determine whether non-binary trees perform better than binary trees. To accomplish this the metaclassifier configuration is switched out for a copy of the first J48 configuration but with the binary-only option disabled.
-
-% Weka: binary vs non binary - significant differences
-%   binary -> non-binary
-%   tic-tac-toe: 
-%       41.36 -> 10 nodes
-%       21.18 -> 7 leaves
-%       92.79 -> 68.96 accuracy
-%       0.93 -> 0.71 F1
-%   monks: always tree with only root node, no F1 score
-%   activity: 85.66 -> 84.43 accuracy (no significant difference in F1)
-% ==> non-binary same or disadvantage
 
 \section{Conclusion}
 In this chapter we discussed the experimental setup for three experiments:
