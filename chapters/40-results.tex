@@ -35,7 +35,20 @@ Specifically for scikit-learn, a pseudo-pruning configuration is added that uses
 % wdbc                  34.78
 % wine                  15.00
 
-\autoref{fig:fig:heat_acc} shows a heatmap of the mean accuracy per scikit-learn configuration and per dataset. The most important observation here is that all configurations except for early stopping behave very similarly, despite large differences in the amount of pruning. Of course this is the purpose of pruning: reduce model complexity without affecting performance too much. This goal is clearly accomplished. At the same time, a strong contrast with the performance of the early stopping criterion is revealed. Across the board, it performs worse than all real pruning configurations.
+The previous heatmap only showed results obtained from the scikit-learn configurations. The next step is to compare these results with those of Weka. \autoref{fig:heat_nodes_diff} visualizes the differences in number of nodes.
+
+\begin{figure}[htp]
+    \includegraphics[width=\textwidth]{img/heatmap_n_nodes_diff.pdf}
+    \caption{Absolute values of the differences between scikit-learn and Weka mean tree size per configuration and per dataset.}%
+    \label{fig:heat_nodes_diff}
+\end{figure}
+
+Most of the differences are minimal. The only configuration with some larger differences is the one where pruning is not applied. The previous heatmap showed us that mean unpruned tree size can be a multiple of any mean pruned tree size. Consequently, the differences in size between unpruned trees are also larger in absolute numbers. Also note that this configuration does not contain custom code developed for this thesis. Additionally, it is proof that CART and C4.5 (and their respective implementations) do not produce the exact same trees, even when configured very similarly.
+
+Column-wise, the letter, activity datasets --- and to a lesser extent also houses and german\_credit datasets --- stand out. These are the datasets which on average generate the largest unpruned trees, yet percentage-wise the effect of pruning on them is average. As a result, their pruned trees are on average also large. This explains the larger absolute differences. When expressed relatively in percentages, the heatmap does not show any remarkable discrepancy between these four datasets and the rest.
+
+\subsection{Accuracy}
+\autoref{fig:heat_acc} shows a heatmap of the mean accuracy per scikit-learn configuration and per dataset. The most important observation here is that all configurations except for early stopping behave very similarly, despite large differences in the amount of pruning. Of course this is the purpose of pruning: reduce model complexity without affecting performance too much. This goal is clearly accomplished. At the same time, a strong contrast with the performance of the early stopping criterion is revealed. Across the board, it performs worse than all real pruning configurations.
 
 \begin{figure}[htp]
     \includegraphics[width=\textwidth]{img/heatmap_accuracy.pdf}
