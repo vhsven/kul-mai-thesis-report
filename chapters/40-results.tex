@@ -14,26 +14,35 @@ The mean size of the trees is shown as a heatmap in \autoref{fig:heat_nodes} for
     \label{fig:heat_nodes}
 \end{figure}
 
-One value exceeds 100\%. This is possible because the pruned trees are not derivatives of the unpruned trees. They are simply two different configurations that are tested independently of each other. In this specific case, Reduced Error Pruning was used with a validation set size of 50\%. Since 10\% of the total was already set apart in the cross-validation procedure, only 45\% of the original data was left to train the tree. This can profoundly change the tree structure, including its size before pruning. This size is unknown, but it must have been larger than the tree size of an unpruned tree trained on 90\% of the original data. Even after pruning, the former tree turned out to be larger than the latter.
+One value exceeds 100\%. This is possible because the pruned trees are not derivatives of the unpruned trees. They are simply two different configurations that are tested independently of each other. In this specific case, Reduced Error Pruning was used with a validation set size equal to 50\% of the training set size. Since 10\% of the dataset was already set apart in the cross-validation procedure, only 45\% of the original data was left to train the tree. Compared to the other algorithms where larger fractions of training set remain, this can profoundly change the tree structure --- including its size --- before pruning. This size is unknown, but it must have been larger than the tree size of an unpruned tree trained on 90\% of the original data. Even after pruning, the former tree turned out to be larger than the latter.
 
-The next observation is that the other rows in the heatmap are quite light, meaning that in general the tree sizes have been reduced greatly by the various pruning strategies. For Error Based Pruning, the confidence factor plays a large role in the amount of pruning that is performed. A very low confidence factor of $10^{-5}$ results in very aggressive pruning while a factor of $10^{-1}$ results in very little pruning. The validation set size of Reduced Error Pruning on the other hand does not have a clear impact on pruning aggression. A larger validation set simply implies that the error estimates become more reliable, but not that they move in any particular direction.
+The next observation is that the other rows in the heatmap are quite light, meaning that in general the tree sizes have been reduced greatly by the various pruning strategies. For Error Based Pruning, the confidence factor plays a large role in the amount of pruning that is performed. A very low confidence factor of $10^{-5}$ results in very aggressive pruning while a factor of $10^{-1}$ results in far less pruning. The validation set size of Reduced Error Pruning on the other hand does not have a clear impact on pruning aggression. A larger validation set only results in more reliable error estimates, but on average these estimates do not move in any particular direction.
 
-Specifically for scikit-learn, a pseudo-pruning configuration is added that uses an early stopping criterion based on the \texttt{min\_samples\_leaf} parameter instead. This is what scikit-learn users do when pruning algorithms are unavailable. As discussed earlier, it is not easy to find a good value for this hyperparameter that performs similarly across a variety of datasets. In this case the result is very aggressive pruning except for datasets wine, iris and hepatitis. This is simply because the unpruned trees of these datasets were small to begin with, and this criterion aims for a low absolute number of nodes. The other configurations also score worse on these datasets because there is less potential for pruning if there are fewer nodes to start with.
+Specifically for scikit-learn, a pseudo-pruning configuration is added that uses an early stopping criterion based on the \texttt{min\_samples\_leaf} parameter instead. This is what scikit-learn users do when pruning algorithms are unavailable. As discussed earlier, it is not easy to find a good value for this hyperparameter that performs similarly across a variety of datasets. In this case the result is very aggressive pruning except for datasets wine, iris and hepatitis. This is simply because the unpruned trees of these datasets were small to begin with, and this criterion aims for a low absolute number of nodes. The other configurations also score worse on these datasets because there is less potential for pruning if there are fewer nodes to start with. \autoref{tbl:unpruned_sizes} gives an overview of the mean unpruned tree size of each dataset.
 
-% activity             580.94
-% diabetes             233.28
-% german_credit        329.32
-% heart-statlog         78.22
-% hepatitis             15.40
-% houses               499.02
-% ionosphere            37.06
-% iris                  16.28
-% letter              3916.08
-% monks-problems-2      91.76
-% tic-tac-toe          143.10
-% vote                  26.32
-% wdbc                  34.78
-% wine                  15.00
+\begin{table}
+    \centering
+    \begin{tabular}[htp]{ l r }
+        Dataset & Size \\ \hline
+        activity &             580.94\\
+        diabetes &             233.28\\
+        german\_credit &       329.32\\
+        heart-statlog &         78.22\\
+        hepatitis &             15.40\\
+        houses &               499.02\\
+        ionosphere &            37.06\\
+        iris &                  16.28\\
+        letter &              3916.08\\
+        monks-problems-2 &      91.76\\
+        tic-tac-toe &          143.10\\
+        vote &                  26.32\\
+        wdbc &                  34.78\\
+        wine &                  15.00\\
+    \end{tabular}
+    \caption{Mean size of unpruned trees (i.e., configuration \emph{none}) for each dataset.}%
+    \label{tbl:unpruned_sizes}
+\end{table}
+
 
 The previous heatmap only showed results obtained from the scikit-learn configurations. The next step is to compare these results with those of Weka. \autoref{fig:heat_nodes_diff} visualizes the differences in number of nodes.
 
@@ -43,12 +52,14 @@ The previous heatmap only showed results obtained from the scikit-learn configur
     \label{fig:heat_nodes_diff}
 \end{figure}
 
-Most of the differences are minimal. The only configuration with some larger differences is the one where pruning is not applied. The previous heatmap showed us that mean unpruned tree size can be a multiple of any mean pruned tree size. Consequently, the differences in size between unpruned trees are also larger in absolute numbers. Also note that this configuration does not contain custom code developed for this thesis. Additionally, it is proof that CART and C4.5 (and their respective implementations) do not produce the exact same trees, even when configured very similarly.
+Most of the differences are minimal. The only configuration with some larger differences is the one where pruning is not applied. The previous heatmap showed us that mean unpruned tree size can be a multiple of any mean pruned tree size. Consequently, the differences in size between unpruned trees are also larger in absolute numbers. Also note that this configuration does not involve any relevant custom code developed for this thesis. Additionally, it is proof that CART and C4.5 (and their respective implementations) do not produce the exact same trees, even when configured very similarly.
 
-Column-wise, the letter, activity datasets --- and to a lesser extent also houses and german\_credit datasets --- stand out. These are the datasets which on average generate the largest unpruned trees, yet percentage-wise the effect of pruning on them is average. As a result, their pruned trees are on average also large. This explains the larger absolute differences. When expressed relatively in percentages, the heatmap does not show any remarkable discrepancy between these four datasets and the rest.
+Column-wise, the letter, activity datasets --- and to a lesser extent also houses and german\_credit datasets --- stand out. These are the datasets which on average generate the largest unpruned trees, as seen in \autoref{tbl:unpruned_sizes}. Percentage-wise the effect pruning has on these four datasets is in line with the other datasets. As a result, their pruned trees are on average also large. This explains the larger absolute differences. When expressed relatively in percentages, the heatmap does not show any remarkable discrepancy between these four datasets and the rest.
+
+In conclusion, the new pruning algorithms for scikit-learn decision trees behave as expected on the structure of the trees. The resulting sizes are grosso modo the same as when the experiments are performed in Weka. The next question is whether the performance also stays the same.
 
 \subsection{Accuracy}
-\autoref{fig:heat_acc} shows a heatmap of the mean accuracy per scikit-learn configuration and per dataset. The most important observation here is that all configurations except for early stopping behave very similarly, despite large differences in the amount of pruning. Of course this is the purpose of pruning: reduce model complexity without affecting performance too much. This goal is clearly accomplished. At the same time, a strong contrast with the performance of the early stopping criterion is revealed. Across the board, it performs worse than all real pruning configurations.
+\autoref{fig:heat_acc} shows a heatmap of the mean accuracy per scikit-learn configuration and per dataset. The most important observation here is that all configurations except for early stopping behave very similarly, despite large differences in the amount of pruning. Of course this is the purpose of pruning: reduce model complexity without affecting performance too much. This goal is clearly accomplished. At the same time, a strong contrast with the performance of the early stopping criterion is revealed. Across the board, it performs worse than all real pruning configurations. In the previous section we learned that early stopping acts on the tree structure the same way an aggressive pruning algorithm would. The main difference is that in general the pruning strategies are in a better position to decide whether a node is really useful. In the end, a tree of the same size but with a better node selection performs better than a tree that stopped growing prematurely because of some very generic criteria.
 
 \begin{figure}[htp]
     \includegraphics[width=\textwidth]{img/heatmap_accuracy.pdf}
@@ -56,9 +67,24 @@ Column-wise, the letter, activity datasets --- and to a lesser extent also house
     \label{fig:heat_acc}
 \end{figure}
 
-This heatmap also clearly shows that accuracy is strongly dependent on the dataset. Not all datasets can be modelled equally well with trees. Differences in class balance also exist between datasets. Accuracy as a metric can be biased when the classes are strongly unbalanced. Alternative metrics such as the F1-score are better suited in such scenarios. A similar heatmap as shown here was generated using this F1-score, but it is not included because the results were almost identical.
+This heatmap also clearly shows that accuracy is strongly dependent on the dataset. Not all datasets can be modelled equally well with trees (or with any classifier for that matter). Differences in class balance also exist between datasets. Accuracy as a metric can be biased when the classes are strongly unbalanced. Alternative metrics such as the F1-score are better suited in such scenarios. A similar heatmap as shown here was generated using this F1-score, but it is not included because the results were almost identical.
 
-%Activity dataset problem could not be reproduced -> very good accuracy even without pruning
+%TODO mention config codes in methodology
+A small note about the result of the \emph{ebp\_0.00001} configuration on the monks dataset: the low value for the confidence value hyperparameter makes the pruner very aggressive. In this case so much that the pruned tree consists of only one node that predicts the majority class all the time.
+
+\begin{figure}[htp]
+    \includegraphics[width=\textwidth]{img/heatmap_accuracy_diff.pdf}
+    \caption{Absolute values of the differences between scikit-learn and Weka mean accuracy scores per configuration and per dataset. The colour scale goes from 0pp (white) to 10pp (black).}%
+    \label{fig:heat_acc_diff}
+\end{figure}
+
+\autoref{fig:heat_acc_diff} reveals that these scikit-learn accuracy scores are almost perfectly in line with the Weka scores. The only real concern is the eight percentage points difference in favour of scikit-learn on the monks dataset using Reduced Error Pruning with a 50\% validation set size. Depending on which half of the data was withheld from training, the tree structure can vary dramatically. Consequently, the accuracy can vary a lot as well.
+%TODO std similar, dig deeper
+
+The same figure also reveals that the accuracy scores on the activity dataset are almost identical between scikit-learn and Weka configurations. Even the unpruned configurations perform almost identical. This contradicts earlier reports that noticed a significant difference in performance between the two tools. We cannot reproduce this issue.
+
+\subsection{Fitting and training time}
+%TODO timing results
 
 \section{Categorical attributes}
 
