@@ -12,14 +12,14 @@ At least for the first two tasks, experiments have to be performed. This chapter
 First, the experimental setup of the pruning validation is discussed. The experiment involves both the new \texttt{PruneableDecisionTreeClassifier} and Weka's J48 classifier. The original \texttt{DecisionTreeClassifier} is not included because the pruneable version can be configured to behave exactly the same. The following configurations are used, showing the specific scikit-learn and Weka parameters:
 
 \begin{itemize}
-    \item no pruning and no early stopping
-    \item early stopping using $\texttt{min\_samples\_leaf} = \frac{0.5}{\texttt{n\_classes}}$ [scikit-learn exclusive]
-    \item REP with $\texttt{rep\_val\_percentage} = 10\%$ or $\texttt{numFolds} = 10$
-    \item REP with $\texttt{rep\_val\_percentage} = 20\%$ or $\texttt{numFolds} = 5$
-    \item REP with $\texttt{rep\_val\_percentage} = 50\%$ or $\texttt{numFolds} = 2$
-    \item EBP with $\texttt{ebp\_confidence} = \texttt{confidenceFactor} = 10^{-5}$
-    \item EBP with $\texttt{ebp\_confidence} = \texttt{confidenceFactor} = 10^{-3}$
-    \item EBP with $\texttt{ebp\_confidence} = \texttt{confidenceFactor} = 10^{-1}$
+    \item[] [\emph{none}] no pruning and no early stopping
+    \item[] [\emph{early\_stop}] early stopping using $\texttt{min\_samples\_leaf} = \frac{0.5}{\texttt{n\_classes}}$
+    \item[] [\emph{rep\_0.1}] REP with $\texttt{rep\_val\_percentage} = 10\%$ or $\texttt{numFolds} = 10$
+    \item[] [\emph{rep\_0.2}] REP with $\texttt{rep\_val\_percentage} = 20\%$ or $\texttt{numFolds} = 5$
+    \item[] [\emph{rep\_0.5}] REP with $\texttt{rep\_val\_percentage} = 50\%$ or $\texttt{numFolds} = 2$
+    \item[] [\emph{ebp\_0.00001}] EBP with $\texttt{ebp\_confidence} = \texttt{confidenceFactor} = 10^{-5}$
+    \item[] [\emph{ebp\_0.00100}] EBP with $\texttt{ebp\_confidence} = \texttt{confidenceFactor} = 10^{-3}$
+    \item[] [\emph{ebp\_0.10000}] EBP with $\texttt{ebp\_confidence} = \texttt{confidenceFactor} = 10^{-1}$
 \end{itemize}
 
 Comparing only pruned versus unpruned trees does not tell the whole story. The pruned trees must also be compared against a sensible baseline of what scikit-learn users do if no pruning algorithm is available. That is why the early stopping configuration with \texttt{min\_samples\_leaf} is also in this list. Unfortunately, finding a good value of this parameter that works across a wide range of datasets is not easy. The current formula depends on the context to (partly) work around this issue: it takes the number of classes into account. Note that for this specific early stopping configuration a mirror configuration in Weka is absent.
