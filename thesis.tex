@@ -8,7 +8,7 @@
   \setup{filingcard,
   translatedtitle=Volledige beslissingsboom inductie functionaliteit in scikit-learn,
   udc=681.3*I20,
-  shortabstract={500 word abstract}} %TODO copy abstract
+  shortabstract={This thesis investigates and attempts to alleviate discrepancies in the implementations of decision tree induction algorithms in two popular machine learning libraries: scikit-learn and Weka. These implementations are based on the CART and C4.5 algorithms respectively. We define a number of capabilities and map those onto the algorithms and implementations. This exercise leads to the identification of three important discrepancies in favour of Weka. First, Weka supports two fully-fledged pruning algorithms: Reduced Error Pruning and Error Based Pruning. Scikit-learn on the other hand does not support pruning, so users rely on the inferior early stopping technique to prevent the trees from overfitting. Second, scikit-learn cannot handle categorical attributes. As a workaround, the user has to pre-process every dataset with some categorical to numerical encoder before it can be used. Third, scikit-learn cannot process datasets that include missing values. CART, C4.5 and Weka do not exhibit the last two issues. Finally, it is also worth mentioning that CART and scikit-learn can only generate binary trees, while C4.5 and Weka do not exhibit this limitation. We introduce new implementations of Reduced Error Pruning and Error Based Pruning for scikit-learn to resolve the first discrepancy. An experiment concludes that regardless of the different underlying algorithms, the various possible pruning configurations now perform similarly between scikit-learn and Weka in terms of tree size, accuracy, fitting- and prediction time. Experiments concerning the categorical attribute issue indicate that the lack of this capability is not as problematic as first thought. The encoding workaround does not have an impact on accuracy and prediction time. Only fitting time (including pre-processing time) is significantly higher, statistically speaking. A similar conclusion is reached for the non-binary tree capability. In our tests, binary trees perform significantly better than non-binary trees in terms of accuracy on the same dataset. On the other hand the fitting phase of binary trees takes longer in some cases. Finally, a newly developed scikit-learn utility takes care of the required data pre-processing and the missing values problem when given any dataset in CSV format.}}
   
   % \setup{coverpageonly}
   
@@ -31,9 +31,16 @@
 \setlength{\parindent}{0cm}
 \setlength{\parskip}{2ex plus 1ex minus 1ex}
 
-\begin{abstract} %TODO update abstract
-  The \texttt{abstract} environment contains a more extensive overview of
-  the work. But it should be limited to one page.~\cite{eibe2016weka}
+\begin{abstract}
+  This thesis investigates and attempts to alleviate discrepancies in the implementations of decision tree induction algorithms in two popular machine learning libraries: scikit-learn and Weka. These implementations are based on the CART and C4.5 algorithms respectively. We define a number of capabilities and map those onto the algorithms and implementations. This exercise leads to the identification of three important discrepancies in favour of Weka. First, Weka supports two fully-fledged pruning algorithms: Reduced Error Pruning and Error Based Pruning. Scikit-learn on the other hand does not support pruning, so users rely on the inferior early stopping technique to prevent the trees from overfitting. Second, scikit-learn cannot handle categorical attributes. As a workaround, the user has to pre-process every dataset with some categorical to numerical encoder before it can be used. Third, scikit-learn cannot process datasets that include missing values. CART, C4.5 and Weka do not exhibit the last two issues. Finally, it is also worth mentioning that CART and scikit-learn can only generate binary trees, while C4.5 and Weka do not exhibit this limitation.
+
+  We introduce new implementations of Reduced Error Pruning and Error Based Pruning for scikit-learn to resolve the first discrepancy. An experiment concludes that regardless of the different underlying algorithms, the various possible pruning configurations now perform similarly between scikit-learn and Weka in terms of tree size, accuracy, fitting- and prediction time.
+
+  Experiments concerning the categorical attribute issue indicate that the lack of this capability is not as problematic as first thought. The encoding workaround does not have an impact on accuracy and prediction time. Only fitting time (including pre-processing time) is significantly higher, statistically speaking.
+  
+  A similar conclusion is reached for the non-binary tree capability. In our tests, binary trees perform significantly better than non-binary trees in terms of accuracy on the same dataset. On the other hand the fitting phase of binary trees takes longer in some cases.
+
+  Finally, a newly developed scikit-learn utility takes care of the required data pre-processing and the missing values problem when given any dataset in CSV format.
 \end{abstract}
 
 \mainmatter%
@@ -48,7 +55,7 @@
 
 \appendixpage*
 \appendix
-\include{chapters/90-app-A} %TODO remove?
+\include{chapters/90-app-A}
 
 \backmatter%
 \bibliographystyle{alpha}

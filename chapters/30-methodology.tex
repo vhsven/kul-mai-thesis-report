@@ -44,9 +44,8 @@ Both scikit-learn and Weka offer tools to facilitate such tests and gather the s
 
 The new implementations of Reduced Error Pruning and Error Based Pruning are judged on three aspects: the accuracy on unseen data and the fitting \& prediction time of the algorithm. The size of the tree and the number of leaves are also saved to get more insight into any potential differences.
 
-\subsection{Datasets}
-\label{ssec:datasets}
-Part of the experimental setup is the choice of datasets. We opt for a variety of real world classification datasets to get a good picture of the pruning implementation's performance. These datasets are primarily taken from \url{www.openml.org}~\cite{openml}. Table \ref{tbl:datasets} gives an overview of all datasets.
+\subsection{Datasets}\label{ssec:datasets}
+Part of the experimental setup is the choice of datasets. We opt for a variety of real world classification datasets to get a good picture of the pruning implementation's performance. These datasets are primarily taken from \url{www.openml.org}~\cite{openml}. \autoref{tbl:datasets} gives an overview of all datasets.
 
 \begin{table}
 \centering
@@ -67,7 +66,7 @@ Part of the experimental setup is the choice of datasets. We opt for a variety o
     \href{https://www.openml.org/d/56}{vote} & 1984 US votes & 2 & 16 & 435 & Yes & 16 \\
     \href{https://www.openml.org/d/55}{hepatitis} & Hepatitis survival & 2 & 19 & 155 & Yes & 13 \\
     % \href{https://www.openml.org/d/172}{shuttle} & Shuttle landing control & 2 & 6 & 15 & Yes & 6 \\
-    \href{http://www.cis.fordham.edu/wisdm/dataset.php}{activity} & Activity prediction & 6 & 45 & 5 424 & Yes & 0 \\
+    \href{http://www.cis.fordham.edu/wisdm/dataset.php}{activity} & Activity prediction & 6 & 45 & 5 424 & Yes & 1 \\
 \end{tabular}
 \caption{Overview of real world classification datasets. Column C indicates the number of classes, A the number of attributes (excluding the class attribute), N the number of observations, M whether the datasets contains missing values and CA the number of categorical attributes (also excluding class).}%
 \label{tbl:datasets}
@@ -77,7 +76,7 @@ These specific datasets were selected for their popularity in the machine learni
 
 The \emph{activity} dataset is the odd one out. It belongs to a study by Kwapisz et al.~\cite{problematic_dataset}. In this study, the activity of a test subject is predicted based on sensor data from cell phone accelerometers. The possible activities are walking, jogging, going upstairs, going downstairs, sitting and standing. Scikit-learn's regular \texttt{DecisionTreeClassifier} performed poorly on this set in the past, although Weka's J48 handled it well.
 
-\section{Evaluate the need for categorical attribute support}
+\section{Evaluate the need for categorical attribute support}\label{sec:meth_cat_attr}
 One of the conclusions in \autoref{cha:software} was that scikit-learn does not support categorical attributes out of the box. The proposed workaround consists of encoding all categorical attributes in a dataset using a one-hot scheme during the pre-processing stage. We hypothesized that this step would not negatively affect the performance of the resulting decision tree classifier. Unfortunately this hypothesis cannot be tested directly in scikit-learn, so Weka is used as a surrogate instead. The J48 can be configured in a way that strongly mimics the behaviour of CART, for example by generating only binary trees and disabling advanced features. If the hypothesis holds for J48 in this configuration, it is reasonable to assume that it would also hold for scikit-learn's decision tree classifier and consequently that there is no need to extend the latter's implementation.
 
 The methodology is exactly the same as the one described in the previous section, except that missing values are retained and that other classifier configurations are involved. More specifically, there are only two classifiers. One is the regular Weka J48 classifier with Error Based Pruning enabled and a fixed confidence value. The other is a metaclassifier called a \texttt{FilteredClassifier} that combines the supervised \texttt{NominalToBinary} attribute filter with another J48 instance configured exactly the same as the first. The filter applies a one-hot encoding on all categorical attributes.

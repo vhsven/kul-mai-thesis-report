@@ -4,7 +4,6 @@ In this chapter the results of the experiments detailed in the previous chapter 
 \section{Pruning}
 In \autoref{cha:software_new}, pruning extensions were added to scikit-learn's decision tree implementations. More specifically, Reduced Error Pruning (REP) and Error Based Pruning (EBP) were implemented. In this section we evaluate how these pruning extensions affect the size of the tree (i.e., the number of nodes), the performance in terms of accuracy and the fitting and prediction speed.
 
-%TODO next, Weka
 \subsection{Tree size}
 The mean size of the trees is shown as a heatmap in \autoref{fig:heat_nodes} for each dataset and each scikit-learn configuration. The values have been normalized by the mean size per dataset of unpruned trees. As such, the \emph{none} row which indicates that no pruning was performed is filled with 100\% values.
 
@@ -60,7 +59,7 @@ A small note about the result of the \emph{ebp\_0.00001} configuration on the mo
 \end{figure}
 
 \autoref{fig:heat_acc_diff} reveals that these scikit-learn accuracy scores are almost perfectly in line with the Weka scores. The only real concern is the eight percentage points difference in favour of scikit-learn on the monks dataset using Reduced Error Pruning with a 50\% validation set size. Depending on which half of the data was withheld from training, the tree structure can vary dramatically. Consequently, the accuracy can vary a lot as well.
-%TODO std similar, dig deeper
+%TODO standard deviation similar, dig deeper?
 
 The same figure also reveals that the accuracy scores on the activity dataset are almost identical between scikit-learn and Weka configurations. Even the unpruned configurations perform almost identical. This contradicts earlier reports that noticed a significant difference in performance between the two tools. We cannot reproduce this issue.
 
@@ -87,17 +86,28 @@ Heatmaps of (differences in) mean prediction times are not included in this text
 This concludes the performance analysis of the new pruning algorithms. As expected, tree size plays a major role in explaining the subtle differences in the results. The heatmaps that show the difference in various performance aspects all reveal that scikit-learn performs very similarly to --- and sometimes even better than --- Weka. This means we successfully increased the feature parity between the two tools, which was one of the main goals of this thesis.
 
 \section{Categorical attributes}
+The second experiment investigates whether the proposed workaround for categorical variables causes a performance impact in terms of tree accuracy, fitting time and prediction time. The workaround consists of applying a one-hot encoding to all categorical attributes. As discussed in \autoref{ssec:cat_attr_handling}, this is required because scikit-learn does not support non-numerical data as input.
+
+The experimental setup is different from the one in the previous section. A statistical test is used to determine whether there is a statistically significant difference between some averaged metric of two distinct populations (i.e., two classifier configurations). The experiment is performed in Weka, and only the \emph{ebp\_0.00100} configuration is considered because it performs most consistently with its scikit-learn mirror configuration. For more details, refer to \autoref{sec:meth_cat_attr}.
+
+The built-in (corrected) paired T-tester of Weka reports no significant difference in accuracy for any dataset. The results are exactly the same for datasets on which the encoding has no effect: datasets without categorical attributes (the first eight entries in \autoref{tbl:datasets}) and datasets where all categorical attributes have exactly two distinct values (vote, hepatitis). That leaves four datasets: activity, monks-problems-2, tic-tac-toe and german\_credit. These four indeed show a measurable yet insignificant difference in accuracy.
+
+The same test is repeated for the fitting time metric (measured in seconds). The pre-processing time is included in the fitting time. Since the pre-processing takes some time, there should be a significant difference for the six datasets with at least one categorical attribute. The results indeed show that these six datasets need a significantly longer fitting time, while the differences are insignificant for the other datasets. There is one unexpected finding: the houses dataset requires significantly less fitting time when (pointless) pre-processing with a one-hot encoder is applied. We have no explanation for this.
+
+Finally, there is no significant difference in prediction time for any dataset.
+
+A copy of the Weka analysis output is available in \autoref{sec:a1}.
+
+In conclusion, the impact of this workaround is small to non-existent. Earlier we found that the differences between scikit-learn and Weka decision tree algorithms in general are limited. Consequently, we can reasonably assume that the same findings also apply to scikit-learn and that undertaking the challenging endeavour of rewriting scikit-learn to make it compatible with categorical attributes is unnecessary.
 
 \section{Binary versus non-binary trees}
-% Weka: binary vs non binary - significant differences
-%   binary -> non-binary
-%   tic-tac-toe: 
-%       41.36 -> 10 nodes
-%       21.18 -> 7 leaves
-%       92.79 -> 68.96 accuracy
-%       0.93 -> 0.71 F1
-%   monks: always tree with only root node, no F1 score
-%   activity: 85.66 -> 84.43 accuracy (no significant difference in F1)
-% ==> non-binary same or disadvantage
+Although binary versus non-binary trees was not a big topic in this thesis, it is still interesting to know how the two strategies compare to each other. To that end, a similar test as in the previous section is setup up. The same remark as above is also valid here: there is no difference between the two approaches if there are no categorical attributes with at least three distinct values.
+
+Of the four datasets where a performance difference is possible, binary trees score significantly better on accuracy for three of them. Only german\_credit shows no significant difference, just like the other datasets. In terms of fitting time, binary trees take significantly longer to train for activity and german\_credit. The other datasets show no significant difference. Finally, once again there is not a single significant difference in prediction time.
+
+A copy of the Weka analysis output is available in \autoref{sec:a2}.
+
+To summarize: if accuracy is the most important metric, these preliminary results suggest to stick with binary trees. If on the other hand fitting time is more important, non-binary trees are worth considering. However, in the cloud age, fitting time can easily be improved by scaling up the computing resources and introducing parallelism. Increasing performance on the other hand is not something that simply requires throwing more resources at the problem. Implementing non-binary trees in scikit-learn is a challenging endeavour, and based on these results we would not give it a high priority on the list of improvement requests.
 
 \section{Conclusion}
+Based on all the results in this chapter, we made the correct assumptions during the planning phase of this thesis. Pruning has proven to be very important, and the newly implemented pruning algorithms in scikit-learn are definitely a welcome improvement. On the other hand, it was smart to hold off on implementing non-binary trees or categorical attributes in scikit-learn, because they turned out not be as big of a problem as we first assumed.

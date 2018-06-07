@@ -7,7 +7,7 @@ The reader ought to be familiar with basic machine learning concepts such as sup
 \section{Scope}
 A wide variety of decision tree induction algorithms exists. Here, only the \emph{top down induction of decision trees (TDIDT)} family is considered. It is the most common approach and it is particularly relevant to the software tools under scrutiny.
 
-Unsupervised and semi-supervised algorithms are out of scope. Furthermore, only classification trees are considered. With little effort, most TDIDT classification algorithms can be converted to regression algorithms. Yet, these are far less popular and better alternatives such as XGBoost~\cite{xgboost} exist.
+Unsupervised and semi-supervised algorithms are out of scope. Furthermore, only classification trees are considered. With little effort, most TDIDT classification algorithms can be converted to regression algorithms. Yet, these are far less popular than their classification counterparts and better alternatives such as XGBoost~\cite{xgboost} exist.
 
 Ensemble methods are also out of scope. Recent decision tree algorithms rarely work with a single (complex) tree, but rather with an ensemble of relatively simple trees. Random forests~\cite{rf} is a very popular example of bootstrap aggregating or \emph{bagging}. Regardless, the scope of this thesis concerns the fundamentals of decision trees, and not their derivatives. On the other hand, implementation improvements suggested in this thesis can potentially benefit related ensemble methods. Other derivatives that are out of scope include logic trees and model trees.
 
@@ -16,11 +16,11 @@ The algorithms in scope are all offline learning methods. This is also known as 
 Finally, only univariate tests are in scope. The test performed in each internal node must only evaluate one attribute of the observation. For categorical attributes, this typically implies checking whether or not the input is equal to a fixed category. For numerical (and thus ordered) attributes, the input value is compared against a fixed threshold using the less than or equal operator. Consequently, the input space is partitioned recursively using axis-aligned hyperplanes. This scope limitation precludes well-known but unpopular extensions such as oblique trees.
 
 \section{Terminology}
-Throughout the relevant literature, there is a lack of ubiquitous vocabulary shared by all researchers. Decision trees are used in various scientific fields, each with its own jargon. Specifically, there is a big divide between researchers that approach the problem from a machine learning perspective compared to those who come from a statistics background. To avoid confusion, we avoid synonyms and always use the same term for the same concept. In the following paragraphs, some basic terms are reviewed. 
+Throughout the relevant literature, there is a lack of ubiquitous vocabulary shared by all researchers. Decision trees are used in various scientific fields, each of which has its own jargon. Specifically, there is a big divide between researchers that approach the problem from a machine learning perspective compared to those who come from a statistics background. To avoid confusion, we avoid synonyms and always use the same term for the same concept. In the following paragraphs, some basic terms are reviewed. 
 
 A \emph{decision tree} consists of \emph{(internal) nodes} which are connected to other nodes via a one-to-many \emph{parent-child} relation on one hand, and \emph{leaves} which have no children on the other hand. The \emph{root node} is the only node without parent. In a \emph{binary tree}, all internal nodes have two children.
 
-Induction algorithms typically receive a \emph{training set} as input data to construct a decision tree while a \emph{test set} is used afterwards for model validation. These sets are tables of data where each row represents an \emph{observation}. All observation are fully described by a common set of \emph{attributes}. Some attributes are \emph{categorical}, others may be \emph{numerical}.\footnote{The latter is sometimes also referred to as \emph{ordered} because this is the underlying property of numbers the algorithm will exploit at some point. Strictly speaking categories can also have an implicit order. In that case, a good practice is to make this explicit by numerically encoding them beforehand.} In a supervised learning context, one or more \emph{target attributes} are present. For classification tasks, target attributes are considered categorical even if they contain numeric data. The distinct values of a target attribute are called the \emph{class labels} of that attribute. A classification task is called \emph{binary classification} if there is exactly one target attribute which has exactly two associated class labels and each observation is associated with exactly one of the two class labels. If multiple class labels can be associated with an observation, the task is called \emph{multilabel classification}. If instead there are more than two class labels, it is referred to as \emph{multiclass classification}. \emph{Multioutput classification} on the other hand occurs when multiple target attributes, each with their own distinct set of class labels, have to be derived from the same set of (non-target) attributes. This can be accomplished trivially by creating multiple trees, each handling one class. However, combining them in one tree might offer performance benefits. Decision trees are one of the few machine learning algorithms that can handle all these modes of operation natively.
+Induction algorithms typically receive a \emph{training set} as input data to construct a decision tree while a \emph{test set} is used afterwards for model validation. These sets are tables of data where each row represents an \emph{observation}. All observation are fully described by a common set of \emph{attributes}. Some attributes are \emph{categorical}, others may be \emph{numerical}.\footnote{The latter is sometimes also referred to as \emph{ordered} because this is the underlying property of numbers the algorithm will exploit at some point. Strictly speaking categories can also have an implicit order. In that case, a good practice is to make this explicit by numerically encoding them beforehand.} In a supervised learning context, one or more \emph{target attributes} are present. For classification tasks, target attributes are considered categorical even if they contain numeric data. The distinct values of a target attribute are called the \emph{class labels} of that attribute. A classification task is called \emph{binary classification} if there is exactly one target attribute which has exactly two associated class labels and each observation is associated with exactly one of the two class labels. If multiple class labels can be associated with an observation, the task is called \emph{multilabel classification}. If instead there are more than two class labels, it is referred to as \emph{multiclass classification}. \emph{Multioutput classification} on the other hand occurs when multiple target attributes, each with their own distinct set of class labels, have to be derived from the same set of (non-target) attributes. This can be accomplished trivially by creating multiple trees, each handling one class. However, combining them in one tree might offer performance benefits~\cite{vens2008decision, multioutput-better}. Decision trees are one of the few machine learning algorithms that can handle all these modes of operation natively.
 
 During \emph{fitting}, first one root node is created and all observations in the training set are stored in this node. When a node is \emph{split} using some \emph{test function}, this function partitions the observations in subsets and then creates a child node for each subset. This process is repeated recursively until some stopping criterion is reached. The \emph{purity} of a node is defined as the percentage of observations in that node that belong to the majority class. A \emph{pure node} is a node with 100\% purity. When the tree is complete, it can \emph{predict} the output based on input from, for example, the test set.
 
@@ -30,7 +30,7 @@ A typical TDIDT algorithm for classification consists of two phases: a grow phas
 \subsection{Univariate test generation}
 Based on the set of observations in a node, tests can be devised that partition this set in a number of subsets. The goal of this step is to generate a finite number of tests $\tau_i \in \mathcal{T}$ based on one associated attribute. Recall the tests based on multiple attributes exist but are out of scope. In the next step, one specific test is chosen from this set of possible tests.
 
-Generating tests for categorical attributes is trivial. For binary trees, each test compares its input (i.e., the value of the associated attribute of an observation) against one fixed value selected from all known values of the associated attribute. If the test is positive, the observation belongs to the first subset, else to the second. This results in as many tests as there are possible values for the associated attribute. For non-binary trees, one test suffices that maps each distinct attribute value to a specific subset. Figures~\ref{fig:categorical_binsplit} and \ref{fig:categorical_split} illustrate the difference. Non-binary trees are typically shallower and thus faster to go through from top to bottom during the inference phase. On the other hand, it is an all-or-nothing approach. If an attributes contains 100 different categories where only a few of them are very relevant, is it worth it to add 100 child nodes to the current node? Binary trees have more flexibility in this regard, but they pay for it in depth.
+Generating tests for categorical attributes is trivial. For binary trees, each test compares its input (i.e., the value of the associated attribute of an observation) against one fixed value selected from all known values of the associated attribute. If the test is positive, the observation belongs to the first subset, else to the second. This results in as many tests as there are possible values for the associated attribute. For non-binary trees, one test suffices that maps each distinct attribute value to a specific subset. Figures~\ref{fig:categorical_binsplit} and~\ref{fig:categorical_split} illustrate the difference. Non-binary trees are typically shallower and thus faster to go through from top to bottom during the inference phase. On the other hand, it is an all-or-nothing approach. If an attributes contains 100 different categories where only a few of them are very relevant, is it worth it to add 100 child nodes to the current node? Binary trees have more flexibility in this regard, but they pay for it in depth.
 
 \begin{figure}[htp]
 \begin{center}
@@ -51,7 +51,7 @@ Generating tests for categorical attributes is trivial. For binary trees, each t
             };
         \end{tikzpicture}
     \end{center}
-    \caption{Example of nodes that perform binary tests associated with the attribute Colour. Two levels are needed to reach the same conclusion as in figure~\ref{fig:categorical_split}. Of course in practice not every value is equally relevant, so it is difficult to make statements about which approach is better without knowing the context.}%
+    \caption{Example of nodes that perform binary tests associated with the attribute Colour. Two levels are needed to reach the same conclusion as in \autoref{fig:categorical_split}. Of course in practice not every value is equally relevant, so it is difficult to make statements about which approach is better without knowing the context.}%
     \label{fig:categorical_binsplit}
 \end{figure}
     
@@ -77,7 +77,7 @@ Generating tests for categorical attributes is trivial. For binary trees, each t
 \label{fig:categorical_split}
 \end{figure}
 
-In the case of numerical attributes, thresholds are introduced to partition the observations based on the implied ordering. That way, an infinite number of tests can be generated, which is of course undesirable. However, at least for the training set, not all tests will result in a different partitioning. A clever choice of thresholds should bring the number of subsets back to a manageable level. Figure~\ref{fig:numerical_split} shows an example.
+In the case of numerical attributes, thresholds are introduced to partition the observations based on the implied ordering. That way, an infinite number of tests can be generated, which is of course undesirable. However, at least for the training set, not all tests will result in a different partitioning. A clever choice of thresholds should bring the number of subsets back to a manageable level. \autoref{fig:numerical_split} shows an example.
 
 \begin{figure}[htp]%
 \label{fig:numerical_split}
@@ -104,7 +104,7 @@ In the case of numerical attributes, thresholds are introduced to partition the 
 Classic TDIDT algorithms work by recursively splitting nodes based on some optimal test $\tau \in \mathcal{T}$, the set of all possible tests. A heuristic called the splitting criterion is required to determine this $\tau$. A few such criteria have stood the test of time.
 
 \subsubsection{Purity}
-The perfect test $\tau^*$ creates a partition $\mathcal{S}_{\tau^*} = \{S_1, \ldots, S_k\}$ wherein each subset is pure, so optimizing for weighted average partition purity is a sensible first criterion.
+Given the set of all associated observations of a node $S$, the perfect test $\tau^*$ induces a partition $\mathcal{S}_{\tau^*} = \{S_1, \ldots, S_k\}$ wherein each subset is pure, so optimizing for weighted average partition purity is a sensible first criterion.
 
 \begin{equation}
     p(\mathcal{S}_\tau) = \sum_i \frac{|S_i|}{|S|} p(S_i)
@@ -114,13 +114,13 @@ Here, $S = S_1 \cup \ldots \cup S_k$ and $p(S)$ is the set purity as described a
 %can also be expressed as impurity instead using the same pattern as below
 
 \subsubsection{Entropy and information gain}
-In practice purity does not appear to work very well. That is why researchers came up with an alternative based on Shannon's information theory~\cite{shannon1948mathematical}. Quinlan used such metrics in many of his prominent algorithms such as ID3 and C4.5~\cite{id3ter, c45}, but it was already invented earlier for the Concept Learning System (CLS)~\cite{cls}. Define entropy (or missing information) of a variable $V$ with possible values $v_i$ and associated probabilities $p_i$ as follows:
+In practice purity does not appear to work very well. That is why researchers came up with an alternative based on Shannon's information theory~\cite{shannon1948mathematical}. Quinlan used such metrics in many of his prominent algorithms such as ID3 and C4.5~\cite{id3ter, c45}, but it was already invented earlier for the Concept Learning System (CLS)~\cite{cls}. Define entropy (or missing information) of a variable $V$ with possible values $v_i$ and associated probabilities $p(v_i)$ as follows:
 
 \begin{equation}
-    s(V) = - \sum_i p_i \log_2(p_i)
+    s(V) = - \sum_i p(v_i) \log_2(p(v_i))
 \end{equation}
 
-The same concept can be applied to the class variable. Define the class entropy $s_C(S)$:
+The same principle can also be applied to a set. When we do this for the set of observations $S$ and the classes $c_i$ associated with those observations, the class entropy $s_C(S)$ is defined as follows:
 
 \begin{equation}
     s_C(S) = - \sum_c p(c) \log_2(p(c))
@@ -149,7 +149,7 @@ Finally, calculate the information gain $h_{IG}(\tau, S)$ of the split that resu
 where $\mathcal{S}_\tau$ is the partition resulting from test $\tau$.
 
 \subsubsection{Gain ratio}
-The information gain criterion is biased towards tests with many possible outcomes. This could be a problem in non-binary trees. The gain ratio alleviates this problem. First define split information $SI(\tau, S)$ --- the maximum possible information gain --- as follows:
+The information gain criterion is biased towards tests with many possible outcomes~\cite{harris2002information}. This could be a problem in non-binary trees. The gain ratio alleviates this problem. First define split information $SI(\tau, S)$ --- the maximum possible information gain --- as follows:
 
 \begin{equation}
     SI(\tau, S) = - \sum_i \frac{|S_i|}{|S|} \log_2 \frac{|S_i|}{|S|}
