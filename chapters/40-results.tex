@@ -4,7 +4,7 @@ In this chapter the results of the experiments detailed in the previous chapter 
 \section{Pruning}
 In \autoref{cha:software_new}, pruning extensions were added to scikit-learn's decision tree implementations. More specifically, Reduced Error Pruning (REP) and Error Based Pruning (EBP) were implemented. In this section we evaluate how these pruning extensions affect the size of the tree (i.e., the number of nodes), the performance in terms of accuracy and the fitting and prediction speed.
 
-\subsection{Tree size}
+\subsection{Tree size}\label{ssec:pruning_treesize}
 The mean size of the trees is shown as a heatmap in \autoref{fig:heat_nodes} for each dataset and each scikit-learn configuration. The values have been normalized by the mean size per dataset of unpruned trees. As such, the \emph{none} row which indicates that no pruning was performed is filled with 100\% values.
 
 \begin{figure}[htp]
@@ -103,7 +103,7 @@ In conclusion, the impact of this workaround is small to non-existent. Earlier w
 \section{Binary versus non-binary trees}
 Although binary versus non-binary trees was not a big topic in this thesis, it is still interesting to know how the two strategies compare to each other. To that end, a similar test as in the previous section is setup up. The same remark as above is also valid here: there is no difference between the two approaches if there are no categorical attributes with at least three distinct values.
 
-Of the four datasets where a performance difference is possible, binary trees score significantly better on accuracy for three of them. Only german\_credit shows no significant difference, just like the other datasets. In terms of fitting time, binary trees take significantly longer to train for activity and german\_credit. The other datasets show no significant difference. Finally, once again there is not a single significant difference in prediction time.
+Of the four datasets where a performance difference is possible, binary trees score significantly better on accuracy for three of them. Only german\_credit shows no significant difference, just like the other datasets. In terms of fitting time, binary trees take significantly longer to train for activity and german\_credit. The other datasets show no significant difference. Note that this finding contradicts earlier research~\cite{elomaa1999general}, so perhaps this needs to be investigated more thoroughly. Finally, once again there is not a single significant difference in prediction time.
 
 A copy of the Weka analysis output is available in \autoref{sec:a2}.
 

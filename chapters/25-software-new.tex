@@ -2,7 +2,7 @@
 In the previous chapter, we found three important features that scikit-learn lacks in comparison to Weka's J48 implementation. In this chapter, we tackle the high priority pruning issue.
 
 \section{New pruning functionality}
-The most straightforward way to solve the pruning problem in scikit-learn is simply to implement an extension that provides this feature. This extension is simply a python package that can be downloaded and installed by anyone who already installed scikit-learn beforehand. We developed a new classifier called the \texttt{PruneableDecisionTreeClassifier} as the main component of such an extension. 
+The most straightforward way to solve the pruning problem in scikit-learn is to implement an extension that provides this feature. This extension is a python package that can be downloaded and installed by anyone who already installed scikit-learn beforehand. We developed a new classifier called the \texttt{PruneableDecisionTreeClassifier} as the main component of such an extension. 
 
 Instead of developing an extension, another option was to fork the complete current scikit-learn codebase and modified that in-place instead. The advantage of this approach is that pull requests can be made on Github to update the original codebase. However, in that case the code must adhere to a very strict contribution policy with requirements beyond the scope of this thesis. For example, scikit-learn must work perfectly with both Python 2.x and Python 3.x distributions. In this thesis we follow the way forward and only support Python 3.x. Additionally, keeping the code up to date involves regular merges with new scikit-learn code. This is not a problem with extensions built against a specific scikit-learn version (i.e., 0.19.1).
 
