@@ -1,18 +1,28 @@
 \chapter{Conclusion}\label{cha:conclusion}
-Intro
+The goal of this thesis was to alleviate certain discrepancies between scikit-learn and Weka concerning decision tree induction for classification. After a literature study in \autoref{cha:literature} and a closer look at the software libraries in \autoref{cha:software} we formalized these discrepancies by defining a set of capabilities and mapping those onto the algorithms and implementation under scrutiny. Three important discrepancies in favour of Weka were selected for further research: the lack of pruning algorithms in scikit-learn and the incapability of scikit-learn to handle datasets with categorical attributes and missing values. Another notable point is that scikit-learn can only generate binary trees while that is optional in Weka.
 
-\section{Contributions}
+To patch the first discrepancy, new implementations of pruning algorithms had to be introduced in scikit-learn. We mirrored the capabilities of Weka by adding Reduced Error Pruning and Error Based Pruning. An experiment concluded that regardless of the different underlying algorithms, the various possible pruning configurations perform similarly between scikit-learn and Weka in terms of tree size, accuracy, fitting- and prediction time.
+
+The second discrepancy was not tackled head-on. Instead, an experiment was first set up to determine whether the commonly accepted workaround of encoding all categorical attributes is a good alternative. It confirmed that the lack of this capability is not as problematic as first thought. Consequently, no change was required in the scikit-learn code for this discrepancy.
+
+A similar story can be told about the non-binary tree capability. An experiment confirmed that binary trees perform the same or better on our selection of test datasets regarding accuracy.
+
+Additionally, a newly developed scikit-learn utility takes care of the required data pre-processing and the missing values problem when given any dataset in CSV format. However, the missing value fix is very blunt in the sense that it removes all observations with at least one missing entry. Future work should patch the decision tree implementation in scikit-learn so that it can deal with missing values natively like CART, C4.5 and Weka do.
+
+To summarize, these are the most important contributions made in this thesis:
 \begin{itemize}
-    \item overview of capabilities
-    \item activity performance problem not reproduced
-    \item pruning implementation (REP + EBP)
-    \item CsvImporter: data pre-processor
-    \item Categorical workaround performance test
+    \item Definition of a set of decision tree capabilities
+    \item A mapping of said capabilities to the CART and C4.5 algorithms 
+    \item A mapping of said capabilities to the decision tree implementations in scikit-learn and Weka
+    \item Two new pruning implementation in scikit-learn: Reduced Error Pruning and Error Based Pruning
+    \item A new scikit-learn utility to easily prepare datasets in CSV format for direct consumption in a decision tree classifier
+    \item Extensive documentation and several examples for the two previous items
+    \item Strong indications that the proposed workaround for categorical attributes does not impact classifier performance
+    \item Strong indications that non-binary trees are not an essential capability
 \end{itemize}
 
-\section{Retrospective}
-\section{Future work}
-\begin{itemize}
-    \item missing values fix inside DT
-    \item cover more edge cases (multioutput, \ldots)
-\end{itemize}
+Finally, we did not manage to reproduce the problem concerning the activity dataset. The trees scikit-learn generates are approximately 50 to 100 nodes smaller than those of Weka. Nonetheless, there is barely any difference in accuracy between the two tools regardless of the configuration used. Prediction time is even shorter in scikit-learn due to the smaller trees.
+
+% \section{Retrospective}
+
+% Future work: cover more edge cases (multioutput, \ldots)

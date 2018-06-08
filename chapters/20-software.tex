@@ -102,14 +102,6 @@ A less significant but related discrepancy is that scikit-learn's decision tree 
 
 In conclusion, the currently accepted workaround of pre-processing the categorical attributes in the input data using a one-hot encoder seems to be our best bet. In the upcoming chapters, we design an experiment that tests whether this workaround has any performance implications. Given the isomorphism between binary tests based on categorical attributes and binary tests based on numerical values that are the result of a one-hot encoding, we hypothesize that the performance impact is limited.
 
-% scikit: no categorical input
-%   cannot be fixed (based on numpy) without complete rewrite
-% also: scikit = binary trees
-%   cannot be fixed without complete rewrite (and Breiman/Weka says it's OK)
-% current workaround: one-hot encoding
-%   isomorphic to binary trees Weka would generate
-%     except = instead of <, but performance on hardware level is same
-
 \subsection{Missing value handling}
 The third and lowest priority problem is the failure of scikit-learn to process datasets containing missing values. Three approaches are possible. The first workaround discards any observation with missing values. Depending on the context, this data loss is somewhere between irrelevant and unacceptable. The second workaround attempts to guess the values for the gaps in the data based on the rest of the data. The user must judge whether this approach is feasible in his context, but it certainly is no universal solution. For that, we look at the third option. Unlike the previous workarounds, this is not a pre-processing step. Instead, the classifier itself must be modified to deal with missing data directly. Decision tree induction algorithms typically have that capability. The C4.5 and CART texts both outline ways to deal with this problem. One option is to split an observation with a missing value into as many fake observations as there are possible values for the missing (categorical) attribute where each distinct value is used once. Some lower internal weight could be assigned to these fake observations to compensate for the data expansion.
 %TODO next steps missing values?
